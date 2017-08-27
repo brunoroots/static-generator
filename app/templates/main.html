@@ -1,0 +1,388 @@
+<style type="text/css">
+/****************************************/
+#static-generator .sg-menu {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	height: 100%;
+	width: 300px;
+	background-color: #EEEEEE;
+	padding: 20px;
+}
+
+#static-generator .sg-menu .generation-container {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border-top: 1px solid #DDDDDD;
+	padding: 20px;
+}
+
+#static-generator .sg-menu .sg-label {
+	font-weight: 600;
+	font-size: 11px;
+	color: #666666;
+	margin-bottom: 6px;
+}
+
+#static-generator .sg-menu select.generation {
+	width: 100%;
+	height: 40px;
+}
+
+#static-generator .sg-menu button {
+	width: 100%;
+	height: 40px;
+	background-color: #3498DB;
+	border-radius: 2px;
+	margin-top: 20px;
+	color: #FFFFFF;
+	font-weight: 600;
+}
+
+#static-generator .sg-menu hr {
+	width: 100%;
+	margin: 40px 0;
+}
+/****************************************/
+#static-generator .sg-menu ul {
+	margin: 0px 0px 0px 30px;
+	list-style: none;
+	line-height: 2em;
+	font-family: Arial;
+	color: #999999;
+}
+
+#static-generator .sg-menu ul li {
+	font-size: 14px;
+	position: relative;
+}
+
+#static-generator .sg-menu ul li a {
+	transition: color 200ms ease-in-out 0ms;
+	color: #666666;
+}
+
+#static-generator .sg-menu ul li a.active, #static-generator .sg-menu ul li a:hover
+	{
+	color: #3498DB;
+}
+
+#static-generator .sg-menu ul li:before {
+	position: absolute;
+	left: -15px;
+	top: 0px;
+	content: '';
+	display: block;
+	border-left: 1px solid #DDDDDD;
+	height: 1em;
+	border-bottom: 1px solid #DDDDDD;
+	width: 10px;
+}
+
+#static-generator .sg-menu ul li:after {
+	position: absolute;
+	left: -15px;
+	bottom: -7px;
+	content: '';
+	display: block;
+	border-left: 1px solid #DDDDDD;
+	height: 100%;
+}
+
+#static-generator .sg-menu ul li.root {
+	margin: 0px 0px 0px -30px;
+	font-weight: 600;
+	font-size: 11px;
+	color: #666666;
+}
+
+#static-generator .sg-menu ul li.root:before {
+	display: none;
+}
+
+#static-generator .sg-menu ul li.root:after {
+	display: none;
+}
+
+#static-generator .sg-menu ul li:last-child:after {
+	display: none;
+}
+
+#static-generator .sg-menu ul li a.create-new-template,
+#static-generator .create-new-template {
+	margin-top: 10px;
+	margin-left: 30px;
+	color: #3498DB;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 600;
+	display: block;
+}
+/****************************************/
+#static-generator .sg-editor {
+	margin-right: 300px;
+}
+
+#static-generator .template-container {
+	position: relative;
+	padding: 20px;
+	border-top: 1px solid #DDDDDD;
+	background-color: #FFFFFF;
+	color: #666666;
+	width: 100%;
+	white-space: pre-wrap;
+	font-family: monospace;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+	counter-reset: line;
+	line-height: 0;
+	margin-top: 0;
+	z-index: 1;
+}
+
+#static-generator .template-container input {
+	display: block;
+	width: 100%;
+	margin-bottom: 20px;
+	font-family: 'Roboto', sans-serif;
+	font-size: 26px;
+	height: auto;
+	font-weight: 100;
+	border-color: #DDDDDD;
+}
+
+#static-generator .template-container input:focus {
+	border-color: #FFFFFF;
+}
+
+#static-generator .template-container div.route {
+	position: relative;
+}
+
+#static-generator .template-container div.no-preview {
+	max-width: calc(100% - 76px);
+}
+
+#static-generator .template-container div.preview {
+	max-width: calc(100% - 152px);
+}
+
+#static-generator .template-container input {
+	min-width: 100%;
+}
+
+#static-generator .multipage {
+	transition: all 200ms ease-in-out 0ms;
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	font-size: 28px;
+	color: #DDDDDD;
+	cursor: pointer;
+}
+
+#static-generator .multipage.enabled {
+	color: #666666;
+}
+
+#static-generator .multipage:hover, #static-generator .multipage.active
+	{
+	color: #3498DB;
+}
+
+#static-generator .template-container .save,
+#static-generator .template-container .delete, #static-generator .template-container .visibility {
+	transition: color 200ms ease-in-out 0ms;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	/*background-color: #EEEEEE;*/
+	border: 1px solid #DDDDDD;
+	color: #999999;
+	width: 56px;
+	height: 56px;
+	text-align: center;
+	border-radius: 2px;
+}
+
+#static-generator .template-container .save {
+    right: 75px;
+}
+
+#static-generator .template-container .save .material-icons,
+#static-generator .template-container .delete .material-icons, #static-generator .template-container .visibility .material-icons
+	{
+	font-size: 28px;
+}
+
+#static-generator .template-container .save:hover,
+#static-generator .template-container .delete:hover {
+	/*background-color: #E53935;*/
+	color: #E53935;
+}
+
+#static-generator .template-container .visibility:hover {
+	/*background-color: #3498DB;*/
+	color: #3498DB;
+}
+
+#static-generator .template-container .visibility {
+	right: 96px;
+}
+
+#static-generator .template-container span {
+	display: inline-block;
+	line-height: 1.7rem;
+	text-indent: -50px;
+	width: 100%;
+	padding-left: 40px;
+	/*white-space: pre;*/
+}
+
+#static-generator .template-container span:before {
+	counter-increment: line;
+	content: counter(line);
+	display: inline-block;
+	border-right: 1px solid #DDDDDD;
+	padding: 0 .5em;
+	margin-right: .5em;
+	color: #CCCCCC;
+	min-width: 18px;
+	text-align: right;
+}
+
+#static-generator .template-container .tag {
+	background-color: #E5F4FF;
+	border-radius: 4px;
+	padding: 1px 1px 2px 1px;
+	margin: 0 2px;
+	color: #3498DB;
+	font-style: normal;
+}
+
+#static-generator .template-container u {
+	text-decoration: none;
+	color: #CCCCCC;
+}
+/****************************************/
+#static-generator input.tab {
+	display: none;
+}
+
+#static-generator label {
+	transition: color 200ms ease-in-out 0ms;
+	position: relative;
+	display: inline-block;
+	margin: 10px 0 -4px;
+	padding: 10px 30px 10px 20px;
+	font-weight: 600;
+	text-align: center;
+	color: #999999;
+	border: 1px solid transparent;
+	border-radius: 3px 3px 0 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 200px;
+	z-index: 2;
+}
+
+#static-generator label:first-of-type {
+	margin-left: 20px;
+}
+
+#static-generator label:hover {
+	color: #666666;
+	cursor: pointer;
+}
+
+#static-generator label .material-icons {
+	transition: color 200ms ease-in-out 0ms;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-size: 16px;
+	color: #CCCCCC;
+	display: none;
+}
+
+#static-generator label .material-icons:hover {
+	color: #E53935;
+}
+
+#static-generator input.tab:checked+label {
+	color: #666666;
+	border: 1px solid #DDDDDD;
+	border-top: 2px solid #3498DB;
+	border-bottom: 1px solid #FFFFFF;
+	background-color: #FFFFFF;
+}
+
+#static-generator input.tab:checked+label .material-icons {
+	display: block;
+}
+
+#static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked 
+	~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked 
+	~ #code4, #static-generator #tab5:checked ~ #code5 {
+	/*display: block;*/
+	
+}
+/****************************************/
+</style>
+
+<div id="static-generator">
+    <div class="sg-menu">
+        <ul>
+            <li class="root">TEMPLATE LIBRARY</li>
+            <li>includes
+                <ul>
+                    {{#savedIncludes}}
+                    <li><a href="#" data-id="{{id}}" class="file">{{file}}</a></li> 
+                    {{/savedIncludes}}
+                </ul>
+                <a href="#" class="create-new-template" data-file-type="include" >Create New Include File </a>
+            </li> 
+            {{#savedPages}}
+            <li><a href="#" data-id="{{id}}" class="file ">{{file}}</a></li> 
+            {{/savedPages}}
+        </ul>
+        <a href="#" class="create-new-template" data-file-type="page" >Create New Page </a>
+        <div class="generation-container">
+            <div class="sg-label">CODE GENERATION</div>
+            <select name="generation" class="generation">
+                <option value="manually" selected="">Manually</option>
+                <option value="frequency">On Frequency</option>
+                <option value="update">On Content Update</option>
+            </select>
+            <button id="generate">GENERATE NOW</button> 
+        </div>
+    </div>
+    <div class="sg-editor">
+        {{#loadedFiles}}
+        <input id="tab-{{id}}" data-id="{{id}}" class="tab" type="radio" {{#if selected}}checked{{/if}} >
+        <label for="tab-{{id}}">{{file}} <i class="material-icons close-tab" data-id="{{id}}">close</i></label> 
+        {{/loadedFiles}} 
+        
+        {{#loadedFiles}}
+        <div id="loaded-template-content-{{id}}" data-id="{{id}}" class="{{^selected}}hidden{{/selected}} template-container">      
+            {{#if isPage}}      
+            <input type="text"  data-file-type="{{type}}" value="{{route}}" placeholder="Enter a route for this page..." class="no-preview page-route">
+            {{/if}} 
+            {{^isPage}}      
+            <input type="text"  data-file-type="{{type}}" value="{{file}}" placeholder="Enter a file name for this include..." class="no-preview page-route">
+            {{/isPage}}
+            <button class="save page-route"><i data-id="{{id}}" class="material-icons" title="Save this file">save</i></button>
+            <button class="delete page-route"><i data-id={{id}} class="material-icons" title="Delete this file">close</i></button>
+            <div class="clearfix"></div>
+            <textarea style="padding:15px 0 15px 0;line-height:normal;min-height:500px;" class="editor">{{contents}}</textarea>
+        </div>
+        {{/loadedFiles}}
+    </div>
+</div>
