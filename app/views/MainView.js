@@ -1,13 +1,12 @@
-define([ 'app', 'backbone', 'core/extensions', 'core/notification', './CreateEditModalView' ],
+define([ 'app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './CreateEditModalView' ],
 
-function(app, Backbone, Extension, Notification, CreateEditModalView) {
+function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 
 	return Extension.View.extend({
 	    template: 'static_generator/app/templates/main',
 	    initialize: function () {
 	      this.listenTo(this.collection.savedTemplates, 'sync', this.render);
-	      this.collection.savedTemplates.fetch();
-	    }, 
+	      this.collection.savedTemplates.fetch();	    }, 
 	    serialize: function () {
 	      return {
 	        savedPages: this.collection.savedTemplates.pagesAsJSON(),
@@ -17,8 +16,8 @@ function(app, Backbone, Extension, Notification, CreateEditModalView) {
 	    },
 	    events: {
 	        "click .create-new-template": "createTemplate",
-	        "click .page-route.save": "saveTemplate",
-	        "click .page-route.delete": "deleteTemplate",
+	        "click .page-route.save i": "saveTemplate",
+	        "click .page-route.delete i": "deleteTemplate",
 	        "click .close-tab": "unloadTemplate",
 	        "click .tab, .file": "loadTemplate",
 	        "click #generate": "generateSite"
@@ -46,8 +45,9 @@ function(app, Backbone, Extension, Notification, CreateEditModalView) {
 	    		this.collection.loadedTemplates.push(tpl);
 	    	}
 	    	
-	    	tpl.set({selected:true});  
+	    	tpl.set({selected:true}); 
 	    	this.render();
+	        
 	    },    
 	    unloadTemplate: function(e) {
 	    	var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});
@@ -71,13 +71,21 @@ function(app, Backbone, Extension, Notification, CreateEditModalView) {
 	    saveTemplate: function(e) {
 	    	var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
 	    		self = this;
-
+//	    	console.log(tpl);
+//	    	console.log({
+//				'id': tpl.get('id'),
+//				'original_route': tpl.get('route'),
+//				'route' : this.$('input[type=text]').val(),
+//				'type': tpl.get('type'),
+//				'contents': this.$('.editor').val()
+//			});return false;
+	    	 
 			this.model.save({
 				'id': tpl.get('id'),
 				'original_route': tpl.get('route'),
-				'route' : this.$('input[type=text]').val(),
+				'route' : $(e.target).closest('.template-container').find('input[type=text]').val(),
 				'type': tpl.get('type'),
-				'contents': this.$('.editor').val()
+				'contents': $(e.target).closest('.template-container').find('.editor').val(),
 			}, {
 				success : function(model, response, options) {
 					Notification.success(response.message);
@@ -88,20 +96,21 @@ function(app, Backbone, Extension, Notification, CreateEditModalView) {
 			});	        
 	    },
 	    deleteTemplate: function(e) {
-	    	// TODO: need to confirm prior to deletion
-	    	var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});
+	    	var self = this;
+	        app.router.openModal({type: 'confirm', text: __t('Are you sure you want to delete this file?'), callback: function () {
+		    	var tpl = self.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});	        	
+		    	tpl.destroy({
+					success : function(model, response, options) {
+						Notification.success(response.message);
+						Backbone.history.loadUrl(Backbone.history.fragment); // TODO: need to update models, 
+																			 // but don't really want to refresh 
+																			 // unsaved content in other tabs
+					}
+				});
+	        }});
+	    	
 
-	    	tpl.destroy({
-				success : function(model, response, options) {
-					Notification.success(response.message);
-					Backbone.history.loadUrl(Backbone.history.fragment); // TODO: need to update models, 
-																		 // but don't really want to refresh 
-																		 // unsaved content in other tabs
-				}
-			});
-//	        app.router.openModal({type: 'confirm', text: '<div>test</div>', callback: function () {
-//            window.location.href = app.API_URL + 'auth/logout';
-//          }});
+
 	    }
 	  });
 });

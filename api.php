@@ -1,47 +1,89 @@
 <?php
 require __DIR__ . '/api/Config.php';
 require __DIR__ . '/api/Template.php';
-require __DIR__ . '/api/Generator.php';
 
 use Directus\Util\ArrayUtils;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Directus\Database\TableGatewayFactory as TableFactory;
+use StaticGenerator\Template;
+use StaticGenerator\Config;
 
 $app = \Directus\Application\Application::getInstance();
 
-$templateStorageAdapter = new Filesystem( new Local( \StaticGenerator\Config::getTemplateStoragePath() ) );
-$template = new \StaticGenerator\Template($templateStorageAdapter);
+$templateStorageAdapter = new Filesystem( new Local( Config::getTemplateStoragePath() ) );
 
 /**************************
  * GET                    *
  **************************/
-$app->get('/templates/?', function () use ($app, $template) {    
+$app->get('/templates/?', function () use ($app, $templateStorageAdapter) {    
 
+    try {       
+        $templates = Template::getAll($templateStorageAdapter);
+        $data = [];
+        
+        if( $templates) {
+            foreach($templates as $template) {
+                $data[] = [              
+                    'id' => $template->id,
+                    'route' => $template->route,
+                    'file' => $template->route,
+                    'type' => $template->type,
+                    'contents' => $template->contents,
+                    'isPage' => $template->type == 'page',
+                    'exists' => $template->exists(),
+                ];
+            }
+        }
 
-
-
-//     $inputStorageAdapter = new Filesystem( new Local( \StaticGenerator\Config::getTemplateStoragePath() ) );
-//     $outputStorageAdapter = new Filesystem( new Local( \StaticGenerator\Config::getOutputStoragePath() ) );
-//     $generator = new \StaticGenerator\Generator($inputStorageAdapter, $outputStorageAdapter);
-//     $generator->generateSite('page');    
-//     dd($staticGenerator->getTemplates());   
-    return $app->response($template->getTemplates());
+        return $app->response($data);
+    }
+    
+    catch (Exception $e) {
+    
+        return $app->response([
+            'success' => false,
+            'error' => [
+                'message' => $e->getMessage(),
+            ],
+        ])->status(400);        
+    }
 });
 
 /**************************
  * POST                   *
  **************************/
-$app->post('/templates', function () use ($app, $template) {
+$app->post('/templates', function () use ($app, $templateStorageAdapter) {
 
     try {     
         // generate site
         if($app->request()->post('generate')) {
             
-            $inputStorageAdapter = new Filesystem( new Local( \StaticGenerator\Config::getTemplateStoragePath() ) );
-            $outputStorageAdapter = new Filesystem( new Local( \StaticGenerator\Config::getOutputStoragePath() ) );
-            $generator = new \StaticGenerator\Generator($inputStorageAdapter, $outputStorageAdapter);
-            $generator->generateSite('page');
+            $outputStorageAdapter = new Filesystem( new Local( Config::getOutputStoragePath() ) );
+            $contents = $outputStorageAdapter->listContents();
+            if($contents) {
+                foreach($contents as $content) {
+                    if(ArrayUtils::get($content, 'type') != 'dir') continue;
+                    
+                    $outputStorageAdapter->deleteDir(ArrayUtils::get($content, 'path'));
+                }
+            }
+        
+            $outputStorageAdapter->deleteDir('output');
+            $templates = Template::getAll($templateStorageAdapter);  
+            
+            if( $templates) {
+                foreach($templates as $template) {
+                    
+                    if($template->type != 'page') continue;
+                    
+                    $parsedTemplates = $template->parseTemplate();
+                    
+                    foreach($parsedTemplates as $parsedTemplate) {
+                        $outputStorageAdapter->put(ArrayUtils::get($parsedTemplate, 'routePath'), ArrayUtils::get($parsedTemplate, 'contents'));
+                    }
+                }
+            }
             
             return $app->response([
                 'success' => true,
@@ -49,13 +91,17 @@ $app->post('/templates', function () use ($app, $template) {
             ]);
         }  
         
-
-        
-        $template->saveTemplate([
-            'route' => $app->request()->post('route'), 
+        $template = new Template($templateStorageAdapter, [
+            'filePath' => $app->request()->post('type') == 'include' ? $app->request()->post('route') : $app->request()->post('route') . '/index.html', 
             'type' => $app->request()->post('type'),
             'contents' => $app->request()->post('contents'),
         ]);
+        
+        if($template->exists()) {
+            throw new Exception('Template already exists.');
+        }
+        
+        $template->save();
     
         return $app->response([
             'success' => true,
@@ -77,22 +123,30 @@ $app->post('/templates', function () use ($app, $template) {
 /**************************
  * PUT                    *
  **************************/
-$app->put('/templates/:id', function ($id = null) use ($app, $template) {
+$app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAdapter) {
 
     try {     
+        
         // if route has changed, delete old and create new
-        if($app->request()->post('original_route') && $app->request()->post('route') != $app->request()->post('original_route')) {   
+        if($app->request()->post('original_route') && $app->request()->post('route') && $app->request()->post('route') != $app->request()->post('original_route')) {   
+
+            $newTemplate = new Template($templateStorageAdapter, [
+                'filePath' => $app->request()->post('type') == 'include' ? $app->request()->post('route') : $app->request()->post('route') . '/index.html', 
+                'type' => $app->request()->post('type'),
+                'contents' => $app->request()->post('contents'),
+            ]);
+            
+            $newTemplate->save();
+            
+            //$template->delete();
+        }  
         
-            $template->deleteTemplate($id);      
-            $id = null;      
-        }        
-        
-        $template->saveTemplate([
-            'id' => $id,
-            'route' => $app->request()->post('route'), 
-            'type' => $app->request()->post('type'),
-            'contents' => $app->request()->post('contents'),
-        ]);
+        else {
+
+            $template = Template::getById($templateStorageAdapter, $id);
+            $template->contents = $app->request()->post('contents');
+            $template->save();
+        }
     
         return $app->response([
             'success' => true,
@@ -114,10 +168,12 @@ $app->put('/templates/:id', function ($id = null) use ($app, $template) {
 /**************************
  * DELETE                 *
  **************************/
-$app->delete('/templates/:id', function ($id = null) use ($app, $template) { 
+$app->delete('/templates/:id', function ($id = null) use ($app, $templateStorageAdapter) { 
 
     try {
-        $template->deleteTemplate($id);
+        
+        $template = Template::getById($templateStorageAdapter, $id);
+        $template->delete();
     
         return $app->response([
             'success' => true,
@@ -136,10 +192,14 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $template) {
     }
 });
 
-
-function dd($c) {
+function du($c) {
     echo '<pre>';
     var_dump($c);
     echo '</pre>';
+}
+
+
+function dd($c) {
+    du($c);
     die();
 }
