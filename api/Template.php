@@ -128,7 +128,8 @@ class Template {
             
             // file must be html if it's an include       
             if($this->type == 'include') {     
-                $segments = array_filter(explode(DIRECTORY_SEPARATOR, $this->route));
+                $segments = explode(DIRECTORY_SEPARATOR, $this->route);
+                $segments = array_filter($segments);
                 $fileName = array_pop($segments);
                 
                 if ( substr($fileName, -5) != '.html') {
@@ -440,7 +441,8 @@ class Template {
             
             if($this->isMultiPage) {
 
-                $routeItems = array_shift($this->queryData([$routeTokens]));
+                $routeItems = $this->queryData([$routeTokens]);
+                $routeItems = array_shift($routeItems);
                 $hash = ArrayUtils::get($routeItems, 'hash');
                 ArrayUtils::remove($routeItems, 'hash');
                 
