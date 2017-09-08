@@ -149,12 +149,28 @@
 #static-generator .template-container input {
 	display: block;
 	width: 100%;
+	min-width: calc(100% - 75px);
 	margin-bottom: 20px;
 	font-family: 'Roboto', sans-serif;
 	font-size: 26px;
 	height: auto;
 	font-weight: 100;
 	border-color: #DDDDDD;
+}
+
+#static-generator .template-container textarea.editor {
+	display: block;
+	border: none;
+	font-size: 14px;
+	line-height: 20px;
+	min-height: 500px;
+	max-width: 100%;
+	padding: 20px 0 20px 0;
+
+}
+#static-generator .template-container textarea.editor:focus {
+	border: none;
+	box-shadow: none;
 }
 
 #static-generator .template-container input:focus {
@@ -171,10 +187,6 @@
 
 #static-generator .template-container div.preview {
 	max-width: calc(100% - 152px);
-}
-
-#static-generator .template-container input {
-	min-width: 100%;
 }
 
 #static-generator .multipage {
@@ -213,6 +225,7 @@
 
 #static-generator .template-container .save {
     right: 75px;
+    display: none;
 }
 
 #static-generator .template-container .save .material-icons,
@@ -328,11 +341,11 @@
 	display: block;
 }
 
-#static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked 
-	~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked 
+#static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked
+	~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked
 	~ #code4, #static-generator #tab5:checked ~ #code5 {
 	/*display: block;*/
-	
+
 }
 /****************************************/
 </style>
@@ -344,13 +357,13 @@
             <li>includes
                 <ul>
                     {{#savedIncludes}}
-                    <li><a href="#" data-id="{{id}}" class="file">{{file}}</a></li> 
+                    <li><a href="#" data-id="{{id}}" class="file">{{file}}</a></li>
                     {{/savedIncludes}}
                 </ul>
                 <a href="#" class="create-new-template" data-file-type="include" >Create New Include File </a>
-            </li> 
+            </li>
             {{#savedPages}}
-            <li><a href="#" data-id="{{id}}" class="file ">{{file}}</a></li> 
+            <li><a href="#" data-id="{{id}}" class="file ">{{file}}</a></li>
             {{/savedPages}}
         </ul>
         <a href="#" class="create-new-template" data-file-type="page" >Create New Page </a>
@@ -361,27 +374,27 @@
                 <option value="frequency">On Frequency</option>
                 <option value="update">On Content Update</option>
             </select>
-            <button id="generate">GENERATE NOW</button> 
+            <button id="generate">GENERATE NOW</button>
         </div>
     </div>
     <div class="sg-editor">
         {{#loadedFiles}}
         <input id="tab-{{id}}" data-id="{{id}}" class="tab" type="radio" {{#if selected}}checked{{/if}} >
-        <label for="tab-{{id}}">{{file}} <i class="material-icons close-tab" data-id="{{id}}">close</i></label> 
-        {{/loadedFiles}} 
-        
+        <label for="tab-{{id}}">{{file}} <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
+        {{/loadedFiles}}
+
         {{#loadedFiles}}
-        <div id="loaded-template-content-{{id}}" data-id="{{id}}" class="{{^selected}}hidden{{/selected}} template-container">      
-            {{#if isPage}}      
+        <div id="loaded-template-content-{{id}}" data-id="{{id}}" class="{{^selected}}hidden{{/selected}} template-container">
+            {{#if isPage}}
             <input type="text"  data-file-type="{{type}}" value="{{route}}" placeholder="Enter a route for this page..." class="no-preview page-route">
-            {{/if}} 
-            {{^isPage}}      
+            {{/if}}
+            {{^isPage}}
             <input type="text"  data-file-type="{{type}}" value="{{file}}" placeholder="Enter a file name for this include..." class="no-preview page-route">
             {{/isPage}}
             <button class="save page-route"><i data-id="{{id}}" class="material-icons" title="Save this file">save</i></button>
             <button class="delete page-route"><i data-id={{id}} class="material-icons" title="Delete this file">close</i></button>
             <div class="clearfix"></div>
-            <textarea style="background: #1e0025; color: #fff; line-height:normal;min-height:500px;max-width:100%;display:block;" class="editor">{{contents}}</textarea>
+            <textarea class="editor">{{contents}}</textarea>
         </div>
         {{/loadedFiles}}
     </div>
