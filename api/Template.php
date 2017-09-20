@@ -3,6 +3,7 @@ namespace StaticGenerator;
 
 use Directus\Util\ArrayUtils;
 use Directus\Database\TableGatewayFactory as TableFactory;
+use Directus\Database\Exception\TableNotFoundException;
 use League\Flysystem\FilesystemInterface as FlysystemInterface;
 use Exception;
 
@@ -61,7 +62,7 @@ class Template {
      * Multi result in one or more generated files per template.
      * For example, `/articles/{{ article.id }}` would result in one generated html file per article.
      * 
-     * @var unknown
+     * @var bool
      */
     private $isMultiPage;    
     
@@ -72,18 +73,44 @@ class Template {
      * @param array $data
      */
     public function __construct(FlysystemInterface $adapter, $data = [])
-    {
-        $this->adapter = $adapter;
-        $this->type = ArrayUtils::get($data, 'type');  
-        $this->filePath = ArrayUtils::get($data, 'filePath');  
-        $this->id = ArrayUtils::get($data, 'id', $this->encodeTemplateId());  
-        $this->route = $this->getRouteFromFilepath();      
-        $this->contents = ArrayUtils::get($data, 'contents'); 
-        $this->isMultiPage = strpos($this->route, '{{') !== false;
- 
-        if( ! $this->contents && $this->exists()) {
-            $this->contents = $this->adapter->read( $this->type . '/' . $this->filePath );
-        }      
+    {      
+        try {  
+            $this->adapter = $adapter;
+            
+            // must provide either `type` and `filePath`, or `id`
+            if( ArrayUtils::get($data, 'type') && ArrayUtils::get($data, 'filePath')) {
+                $this->type = ArrayUtils::get($data, 'type');  
+                $this->filePath = ArrayUtils::get($data, 'filePath');      
+                $this->id = $this->encodeTemplateId();        
+            }
+            
+            else if( ArrayUtils::get($data, 'id') ) {
+                $this->id = ArrayUtils::get($data, 'id');
+                
+                $path = $this->decodeTemplateId();
+                $pathParts = explode('/', $path);
+                
+                $this->type = array_shift($pathParts);
+                $this->filePath = implode('/', $pathParts); 
+            }
+                
+            else {
+                throw new Exception('You must pass either a template `id` or `type` and `filePath`');
+            }
+              
+            $this->contents = ArrayUtils::get($data, 'contents'); 
+     
+            if( ! $this->contents && $this->exists()) {
+                $this->contents = $this->adapter->read( $this->type . '/' . $this->filePath );
+            }  
+            
+            $this->route = $this->extractRoute();
+            $this->isMultiPage = strpos($this->route, '{{') !== false;
+        }
+        
+        catch (Exception $e){
+            throw $e;
+        }    
     }
     
     /**
@@ -106,40 +133,12 @@ class Template {
     public function __set($name, $val) 
     {
         if( property_exists($this, $name)) {
-            $this->{$name} = $val;
-        }
-    }
-    
-    /**
-     * Validate template data
-     * 
-     * @throws Exception
-     */
-    public function validate()
-    {
-        try {       
-            if( ! $this->filePath) {
-                throw new Exception('Invalid template file path.');
-            }
             
-            if( ! in_array($this->type, self::$supportedTemplateTypes)) {
-                throw new Exception('Invalid template type.');
-            }
+            $this->{$name} = $val;  
             
-            // file must be html if it's an include       
-            if($this->type == 'include') {     
-                $segments = explode(DIRECTORY_SEPARATOR, $this->route);
-                $segments = array_filter($segments);
-                $fileName = array_pop($segments);
-                
-                if ( substr($fileName, -5) != '.html') {
-                    throw new Exception('The file extension must be `.html`.  Ex - `' . $fileName . '.html`.');
-                }
+            if( $name == 'filePath') {
+                $this->id = $this->encodeTemplateId();
             }
-        }
-        
-        catch (Exception $e) {
-            throw $e;
         }
     }
     
@@ -151,8 +150,7 @@ class Template {
     public function save()
     {
         try {           
-            $this->validate();
-            
+                        
             $path = $this->decodeTemplateId($this->id);            
             $this->adapter->put($path, $this->contents);
         }
@@ -223,6 +221,10 @@ class Template {
             foreach(self::getAll($this->adapter) as $template) {
             
                 $source = $twig->getLoader()->getSource($template->type . '/' . $template->filePath);
+                
+                // remove directus directives
+                $source = preg_replace('/<!---(.*?)--->/', '', $source);
+                                
                 $tokens = $twig->tokenize($source);
                             
                 
@@ -233,7 +235,7 @@ class Template {
                         
                         if( $tokens->isEOF()) break;
                         
-                        if($token->getValue() != 'directus') continue;
+                        if( $token->getValue() != 'directus') continue;
                         
                         if($tokens->look()->getValue() == '.') {                    
                             $tokens->next(); // dot
@@ -348,13 +350,21 @@ class Template {
             $data = [];
             if($templateTokens) {            
                 foreach($templateTokens as $token) {
-
-                    try {
-                        $table = TableFactory::create(ArrayUtils::get($token, 'table'));
-                    }
                     
-                    catch (\Directus\Database\Exception\TableNotFoundException $e) {
-                        continue;
+                    if( ArrayUtils::get($token, 'tableObj')) {
+                        
+                        $table = ArrayUtils::get($token, 'tableObj');
+                    }
+
+                    else {
+                        
+                        try {
+                            $table = TableFactory::create(ArrayUtils::get($token, 'table'));
+                        }
+                        
+                        catch (TableNotFoundException $e) {
+                            continue;
+                        }
                     }
                     
                     parse_str(ArrayUtils::get($token, 'param'), $param);
@@ -383,7 +393,7 @@ class Template {
      * @return array
      * @throws Exception
      */
-    public function parseTemplate()
+    public function parseTemplate($templateTokens = [], $routeTokens = [])
     {
         try {   
             if( $this->type != 'page') {
@@ -391,15 +401,14 @@ class Template {
             }
             
             $tokenMap = [];
-            $routeTokens = [];
             $output = [];
             
             if($this->isMultiPage) {
-                $routeTokens = $this->tokenizeRoute();
+                $routeTokens = $routeTokens ? $routeTokens : $this->tokenizeRoute();
                 $tokenMap = ['this' => $routeTokens];
             }
-                
-            $templateTokens = $this->tokenizeTemplate($tokenMap);
+           
+            $templateTokens = $templateTokens ? $templateTokens : $this->tokenizeTemplate($tokenMap);
             $data = $this->queryData( $templateTokens );
     
             $twig = new \Twig_Environment( new \Twig_Loader_Filesystem( $this->adapter->getAdapter()->getPathPrefix()) );
@@ -408,6 +417,9 @@ class Template {
             foreach(self::getAll($this->adapter) as $template) {
                 
                 $source = $twig->getLoader()->getSource($template->type . '/' . $template->filePath);
+                
+                // remove directus directives
+                $source = preg_replace('/<!---(.*?)--->/', '', $source);
                 
                 if($tokenMap) {
                     foreach($tokenMap as $key => $val) {
@@ -449,13 +461,12 @@ class Template {
                 foreach($routeItems as $key => $val) {
 
                     $directusData['directus'][$hash] = $val;
-                    
                     $output[] = [
                         'contents' => $template->render($directusData),
                         'routePath' => str_replace(
                             ArrayUtils::get($routeTokens, 'routeExpression'), 
                             ArrayUtils::get($val, ArrayUtils::get($routeTokens, 'field')),
-                            $this->filePath),
+                            $this->route) . '/index.html',
                     ];
                 }
             }
@@ -464,7 +475,7 @@ class Template {
                            
                 $output[] = [
                     'contents' => $template->render($directusData),
-                    'routePath' => $this->filePath,
+                    'routePath' => $this->route . '/index.html',
                 ];
             }
            
@@ -480,7 +491,7 @@ class Template {
         
         catch (Exception $e) {
            
-            if($compiledPaths) {
+            if( isset($compiledPaths) && $compiledPaths ) {
                 foreach($compiledPaths as $path) {
                     $this->adapter->delete($path);
                     $this->adapter->rename($path . '._locked', $path);
@@ -512,6 +523,8 @@ class Template {
                 foreach($files as $file) {    
                     
                     if( ArrayUtils::get($file, 'type') == 'dir') continue;
+                    
+                    if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
 
                     $segments = explode(DIRECTORY_SEPARATOR, ArrayUtils::get($file, 'path'));
                     
@@ -544,8 +557,7 @@ class Template {
     public static function getById(FlysystemInterface $adapter, $id)
     { 
         try {
-            $template = new Template($adapter);
-            $template->id = $id;
+            $template = new Template($adapter, ['id' => $id]);
             $decoded = $template->decodeTemplateId();
             
             if( ! $decoded) {
@@ -556,8 +568,7 @@ class Template {
            
            $template->type = array_shift($segments);
            $template->filePath = implode('/', $segments);
-           $template->route = $template->getRouteFromFilePath();
-           $template->id = $id;
+           $template->route = $template->extractRoute();
            
            if( ! $template->exists()) {
                throw new Exception('Template not found.');
@@ -581,15 +592,12 @@ class Template {
      * @return string
      * @throws Exception
      */
-    public function getRouteFromFilepath()
+    public function extractRoute()
     {        
         try {
-           if( $this->type == 'include') return $this->filePath;
+           preg_match('/directus_route:(.*?)--->/', $this->contents, $matches);
            
-           $segments = explode('/', $this->filePath);
-           array_pop($segments);
-           
-           return '/' . implode('/', $segments);
+           return trim(ArrayUtils::get($matches, 1, ''));
         }
         
         catch (Exception $e) {
@@ -604,7 +612,9 @@ class Template {
      */
     private function encodeTemplateId()
     {
-        return base64_encode($this->type . '/' . $this->filePath);
+        $res = base64_encode($this->type . '/' . $this->filePath);
+        $res = str_replace('=', '', $res);
+        return $res;
     }
     
     /**

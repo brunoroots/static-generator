@@ -341,6 +341,11 @@
 	display: block;
 }
 
+i.delete-file, i.edit-file {
+    cursor:pointer;
+    font-size:18px;
+}
+
 #static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked
 	~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked
 	~ #code4, #static-generator #tab5:checked ~ #code5 {
@@ -357,16 +362,22 @@
             <li>includes
                 <ul>
                     {{#savedIncludes}}
-                    <li><a href="#" data-id="{{id}}" class="file">{{file}}</a></li>
+                    <li>
+                        <a href="#" data-id="{{id}}" class="file">{{file}}</a>
+                        <i data-id="{{id}}" class="material-icons delete-file">delete</i>
+                        <i data-id="{{id}}" class="material-icons edit-file">edit</i>
+                    </li>
                     {{/savedIncludes}}
                 </ul>
-                <a href="#" class="create-new-template" data-file-type="include" >Create New Include File </a>
             </li>
             {{#savedPages}}
-            <li><a href="#" data-id="{{id}}" class="file ">{{file}}</a></li>
+            <li>
+                <a href="#" data-id="{{id}}" class="file ">{{file}}</a>
+                <i data-id="{{id}}" class="material-icons delete-file">delete</i>
+                <i data-id="{{id}}" class="material-icons edit-file">edit</i>
+            </li>
             {{/savedPages}}
         </ul>
-        <a href="#" class="create-new-template" data-file-type="page" >Create New Page </a>
         <div class="generation-container">
             <div class="sg-label">CODE GENERATION</div>
             <select name="generation" class="generation">
@@ -385,15 +396,6 @@
 
         {{#loadedFiles}}
         <div id="loaded-template-content-{{id}}" data-id="{{id}}" class="{{^selected}}hidden{{/selected}} template-container">
-            {{#if isPage}}
-            <input type="text"  data-file-type="{{type}}" value="{{route}}" placeholder="Enter a route for this page..." class="no-preview page-route">
-            {{/if}}
-            {{^isPage}}
-            <input type="text"  data-file-type="{{type}}" value="{{file}}" placeholder="Enter a file name for this include..." class="no-preview page-route">
-            {{/isPage}}
-            <button class="save page-route"><i data-id="{{id}}" class="material-icons" title="Save this file">save</i></button>
-            <button class="delete page-route"><i data-id={{id}} class="material-icons" title="Delete this file">close</i></button>
-            <div class="clearfix"></div>
             <textarea class="editor">{{contents}}</textarea>
         </div>
         {{/loadedFiles}}

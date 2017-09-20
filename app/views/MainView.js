@@ -1,12 +1,13 @@
-define([ 'app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './CreateEditModalView' ],
+define([ 'app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './CreateTemplateModalView', './EditTemplatePathModalView' ],
 
-function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
+function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, EditTemplatePathModalView ) {
 
 	return Extension.View.extend({
 	    template: 'static_generator/app/templates/main',
 	    initialize: function () {
 	      this.listenTo(this.collection.savedTemplates, 'sync', this.render);
-	      this.collection.savedTemplates.fetch();	    }, 
+	      this.collection.savedTemplates.fetch();	    
+	    }, 
 	    serialize: function () {
 	      return {
 	        savedPages: this.collection.savedTemplates.pagesAsJSON(),
@@ -17,7 +18,8 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 	    events: {
 	        "click .create-new-template": "createTemplate",
 	        "click .page-route.save i": "saveTemplate",
-	        "click .page-route.delete i": "deleteTemplate",
+	        "click i.delete-file": "deleteTemplate",
+	        "click i.edit-file": "editTemplatePath",
 	        "click .close-tab": "unloadTemplate",
 	        "click .tab, .file": "loadTemplate",
 	        "click #generate": "generateSite"
@@ -34,7 +36,10 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 				}
 			});
 	    },
-	    loadTemplate: function(e){
+	    initSaveBtn: function(saveBtn) {
+	    	this.saveBtn = saveBtn;
+	    },
+	    loadTemplate: function(e){	    	
 	    	var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
 				selected = this.collection.loadedTemplates.findWhere({selected: true});
 
@@ -44,6 +49,8 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 	    		tpl = this.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});
 	    		this.collection.loadedTemplates.push(tpl);
 	    	}
+	    	
+	    	this.saveBtn.setEnabled(true);
 	    	
 	    	tpl.set({selected:true}); 
 	    	this.render();
@@ -59,33 +66,34 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 	    		
 	    		if(!selected && tpl) tpl.set({selected:true}); 
 	    		
+	    		if( ! this.collection.loadedTemplates.length) {
+	    	    	this.saveBtn.setEnabled(false);
+	    		}
+	    		
 	    		this.render();
 	    	}    	
 	    },
 	    createTemplate: function(e) {
-	    	app.router.openViewInModal(new CreateEditModalView({
-	    		model: this.model,
-	    		id: $(e.target).attr('data-file-type')	
+	    	app.router.openViewInModal(new CreateTemplateModalView({
+	    		model: this.model	
+	    	}) );	        
+	    },
+	    editTemplatePath: function(e) {
+	    	var tpl = this.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});
+
+	    	app.router.openViewInModal(new EditTemplatePathModalView({
+	    		model: tpl
 	    	}) );	        
 	    },
 	    saveTemplate: function(e) {
-	    	var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
-	    		self = this;
-//	    	console.log(tpl);
-//	    	console.log({
-//				'id': tpl.get('id'),
-//				'original_route': tpl.get('route'),
-//				'route' : this.$('input[type=text]').val(),
-//				'type': tpl.get('type'),
-//				'contents': this.$('.editor').val()
-//			});return false;
-	    	 
+	    	var tpl = this.collection.loadedTemplates.findWhere({selected: true});
+	    	var self = this;
+
 			this.model.save({
 				'id': tpl.get('id'),
-				'original_route': tpl.get('route'),
-				'route' : $(e.target).closest('.template-container').find('input[type=text]').val(),
 				'type': tpl.get('type'),
-				'contents': $(e.target).closest('.template-container').find('.editor').val(),
+				'contents': $('#loaded-template-content-'+tpl.get('id')).find('textarea.editor').val(),
+				'filePath': tpl.get('file')
 			}, {
 				success : function(model, response, options) {
 					Notification.success(response.message);
@@ -98,7 +106,8 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 	    deleteTemplate: function(e) {
 	    	var self = this;
 	        app.router.openModal({type: 'confirm', text: __t('Are you sure you want to delete this file?'), callback: function () {
-		    	var tpl = self.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});	        	
+		    	var tpl = self.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});	
+
 		    	tpl.destroy({
 					success : function(model, response, options) {
 						Notification.success(response.message);
@@ -108,9 +117,6 @@ function(app, Backbone, __t, Extension, Notification, CreateEditModalView ) {
 					}
 				});
 	        }});
-	    	
-
-
 	    }
 	  });
 });
