@@ -1,0 +1,8 @@
+<!--- directus_route: /example/users/{{directus_users.id | filters[id][gt]=0}} --->
+{% extends "include/example/base.html" %}
+
+
+{% block content %}    
+    <h2>User info displayed in `/example/users/[user.id]/index.html`</h2>
+    <div>Email: {{ directus.this.email }}</div>
+{% endblock %}

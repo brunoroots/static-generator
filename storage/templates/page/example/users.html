@@ -1,6 +1,7 @@
-{% extends "include/base.html" %}
+<!--- directus_route: /example/users ---> 
+{% extends "include/example/base.html" %}
 
-{% block content %}
+{% block content %}    
     <h2>Directus users displayed in `/example/users/index.html`</h2>
     <ul>
     {% for user in directus.directus_users("filters[id][gt]=0") %}
