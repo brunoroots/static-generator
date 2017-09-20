@@ -19,6 +19,7 @@ $templateStorageAdapter = new Filesystem( new Local( Config::getTemplateStorageP
 $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {    
 
     try {       
+        
         $templates = Template::getAll($templateStorageAdapter);
         $data = [];
         
@@ -27,7 +28,7 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
                 $data[] = [              
                     'id' => $template->id,
                     'route' => $template->route,
-                    'file' => $template->route,
+                    'file' => $template->filePath,
                     'type' => $template->type,
                     'contents' => $template->contents,
                     'isPage' => $template->type == 'page',
@@ -55,8 +56,11 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
  **************************/
 $app->post('/templates', function () use ($app, $templateStorageAdapter) {
 
-    try {     
-        // generate site
+    try {  
+                   
+        /**
+         * Generate site
+         */
         if($app->request()->post('generate')) {
             
             $outputStorageAdapter = new Filesystem( new Local( Config::getOutputStoragePath() ) );
@@ -91,12 +95,30 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             ]);
         }  
         
+        /**
+         * Create new template
+         */
+        // validation
+        if( ! $app->request()->post('filePath')) {
+            throw new Exception('Please enter a file path.');
+        }
+        
+        if( ! $app->request()->post('type')) {
+            throw new Exception('Please select a template type.');
+        }
+        
+        if ( substr($app->request()->post('filePath'), -5) != '.html') {
+            throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
+        }
+        
+        // instantiate
         $template = new Template($templateStorageAdapter, [
-            'filePath' => $app->request()->post('type') == 'include' ? $app->request()->post('route') : $app->request()->post('route') . '/index.html', 
+            'filePath' => $app->request()->post('filePath'), 
             'type' => $app->request()->post('type'),
             'contents' => $app->request()->post('contents'),
         ]);
         
+        // check and save
         if($template->exists()) {
             throw new Exception('Template already exists.');
         }
@@ -127,25 +149,36 @@ $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAda
 
     try {     
         
-        // if route has changed, delete old and create new
-        if($app->request()->post('original_route') && $app->request()->post('route') && $app->request()->post('route') != $app->request()->post('original_route')) {   
-
-            $newTemplate = new Template($templateStorageAdapter, [
-                'filePath' => $app->request()->post('type') == 'include' ? $app->request()->post('route') : $app->request()->post('route') . '/index.html', 
-                'type' => $app->request()->post('type'),
-                'contents' => $app->request()->post('contents'),
-            ]);
-            
-            $newTemplate->save();
-            
-            //$template->delete();
-        }  
+        // validation
+        if( ! $app->request()->post('filePath')) {
+            throw new Exception('Please enter a file path.');
+        }
         
-        else {
+        if ( substr($app->request()->post('filePath'), -5) != '.html') {
+            throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
+        }
+        
+        // instantiate template
+        $template = Template::getById($templateStorageAdapter, $id);
+        
+        // save template
+        $filePathChanged = false;
 
+        if( $app->request()->post('filePath') && $app->request()->post('filePath') != $template->filePath) {
+            $filePathChanged = true;
+        }
+        
+        if($filePathChanged) {
+            $template->filePath = $app->request()->post('filePath');
+        }
+        
+        $template->contents = $app->request()->post('contents');
+        $template->save();
+        
+        // if file path is different, delete the old template
+        if( $filePathChanged) {
             $template = Template::getById($templateStorageAdapter, $id);
-            $template->contents = $app->request()->post('contents');
-            $template->save();
+            $template->delete();
         }
     
         return $app->response([
