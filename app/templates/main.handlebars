@@ -359,24 +359,9 @@ i.delete-file, i.edit-file {
     <div class="sg-menu">
         <ul>
             <li class="root">TEMPLATE LIBRARY</li>
-            <li>includes
-                <ul>
-                    {{#savedIncludes}}
-                    <li>
-                        <a href="#" data-id="{{id}}" class="file">{{file}}</a>
-                        <i data-id="{{id}}" class="material-icons delete-file">delete</i>
-                        <i data-id="{{id}}" class="material-icons edit-file">edit</i>
-                    </li>
-                    {{/savedIncludes}}
-                </ul>
-            </li>
-            {{#savedPages}}
-            <li>
-                <a href="#" data-id="{{id}}" class="file ">{{file}}</a>
-                <i data-id="{{id}}" class="material-icons delete-file">delete</i>
-                <i data-id="{{id}}" class="material-icons edit-file">edit</i>
-            </li>
-            {{/savedPages}}
+        {{#dirStructureAsUL}}
+            {{{dirTree}}}
+        {{/dirStructureAsUL}}
         </ul>
         <div class="generation-container">
             <div class="sg-label">CODE GENERATION</div>

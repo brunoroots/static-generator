@@ -13,6 +13,42 @@ $app = \Directus\Application\Application::getInstance();
 
 $templateStorageAdapter = new Filesystem( new Local( Config::getTemplateStoragePath() ) );
 
+function makeTree($arr) 
+{
+    $part = array_shift($arr);
+    
+    if( ! $arr) {
+        return [$part];
+    }
+    
+    $tree[$part] = makeTree($arr);
+    
+    return $tree;
+}
+
+function toUL($data = false, $flatten = false)
+{
+    $response = '<ul>';
+    if (false !== $data) {
+        foreach ($data as $key => $val) {
+            $response .= '<li>';
+            if (! is_array($val)) {
+                $response .= '<a href="#">' . $val . '</a>';
+            } else {
+                if (! $flatten) {
+                    $response .= $key . ' ' . toUL($val);
+                } else {
+                    // pulls the sub array into the current list context
+                    $response .= substr($response, 0, strlen($response) - 5) . toUL($val);
+                }
+            }
+            $response .= '</li>';
+        }
+    }
+    $response .= '</ul>';
+    return $response;
+}
+
 /**************************
  * GET                    *
  **************************/
@@ -21,10 +57,15 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
     try {       
         
         $templates = Template::getAll($templateStorageAdapter);
+        
         $data = [];
         
+        $directoryTree = [];
         if( $templates) {
             foreach($templates as $template) {
+               
+                $directoryTree = array_merge_recursive($directoryTree, makeTree(explode('/', $template->filePath)));
+                              
                 $data[] = [              
                     'id' => $template->id,
                     'route' => $template->route,
@@ -33,9 +74,15 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
                     'contents' => $template->contents,
                     'isPage' => $template->type == 'page',
                     'exists' => $template->exists(),
+                    'hasDirTree' => false,
                 ];
             }
         }
+        //dd($directoryTree);
+        $data[] = [
+            'hasDirTree' => true,
+            'dirTree' => toUL($directoryTree),
+        ];
 
         return $app->response($data);
     }
@@ -227,7 +274,7 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorage
 
 function du($c) {
     echo '<pre>';
-    var_dump($c);
+    print_r($c);
     echo '</pre>';
 }
 

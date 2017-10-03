@@ -6,14 +6,19 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	    template: 'static_generator/app/templates/main',
 	    initialize: function () {
 	      this.listenTo(this.collection.savedTemplates, 'sync', this.render);
-	      this.collection.savedTemplates.fetch();	    
+	      this.listenTo(this.collection.savedTemplates, 'sync', this.displayDirTree);
+	      this.collection.savedTemplates.fetch();	
 	    }, 
 	    serialize: function () {
 	      return {
 	        savedPages: this.collection.savedTemplates.pagesAsJSON(),
 	        savedIncludes: this.collection.savedTemplates.includesAsJSON(),
-	        loadedFiles: this.collection.loadedTemplates.filesAsJSON()
+	        loadedFiles: this.collection.loadedTemplates.filesAsJSON(),
+	        dirStructureAsUL: this.collection.savedTemplates.dirStructureAsUL()
 	      };
+	    },
+	    displayDirTree: function() {
+
 	    },
 	    events: {
 	        "click .create-new-template": "createTemplate",
@@ -54,6 +59,7 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	    	
 	    	tpl.set({selected:true}); 
 	    	this.render();
+	    	this.displayDirTree();
 	        
 	    },    
 	    unloadTemplate: function(e) {
