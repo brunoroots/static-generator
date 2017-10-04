@@ -1,6 +1,7 @@
 <?php 
 namespace StaticGenerator;
 
+use StaticGenerator\Config;
 use Directus\Util\ArrayUtils;
 use Directus\Database\TableGatewayFactory as TableFactory;
 use Directus\Database\Exception\TableNotFoundException;
@@ -571,6 +572,70 @@ class Template {
         catch (Exception $e) {
             throw $e;
         }  
+    }
+    
+    public static function generateSite(FlysystemInterface $templateStorageAdapter, FlysystemInterface $outputStorageAdapter)
+    {
+        $contents = $outputStorageAdapter->listContents();
+        if($contents) {
+            foreach($contents as $content) {
+                if(ArrayUtils::get($content, 'type') != 'dir') continue;
+                $outputStorageAdapter->deleteDir(ArrayUtils::get($content, 'path'));
+            }
+        }
+        
+        $templates = self::getAll($templateStorageAdapter);
+        
+        if( $templates) {
+            foreach($templates as $template) {
+                $parsedTemplates = $template->parseTemplate();
+                foreach($parsedTemplates as $parsedTemplate) {
+                    $outputStorageAdapter->put(ArrayUtils::get($parsedTemplate, 'routePath'), ArrayUtils::get($parsedTemplate, 'contents'));
+                }
+            }
+        }
+        
+        Config::setLastGenerated();
+    }
+        
+    /**
+     * Get template storage path
+     * 
+     * @return string
+     */
+    public static function getTemplateStoragePath()
+    {
+        return __DIR__ . '/../storage/templates';
+    }
+    
+    /**
+     * Get output directory root
+     * 
+     * @return string
+     */
+    public static function getOutputDirectoryRoot()
+    {
+        return BASE_PATH;
+    }
+    
+    /**
+     * Validate output path
+     * 
+     * @param string $path
+     */
+    public static function isValidOutputPath($path = '') 
+    {
+        if( ! $path || $path == '/' || strpos($path, '..') !== false) return false;
+        
+        $pathSegments = explode('/', $path);
+        $topDirectory = array_shift($pathSegments);
+  
+        $forbiddenDirectories = ['.git', '.github', '..', 'api', 'app', 'assets', 'bin', 'customs', 'installation', 'templates', 'tests', 'thumbnail', 'vendor'];
+        if( in_array($topDirectory, $forbiddenDirectories)) {
+            return false;
+        }
+        
+        return true;
     }
     
     /**

@@ -1,17 +1,31 @@
 <?php
-require __DIR__ . '/api/Config.php';
 require __DIR__ . '/api/Template.php';
+require __DIR__ . '/api/Config.php';
+require __DIR__ . '/api/helpers.php';
 
 use Directus\Util\ArrayUtils;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
-use Directus\Database\TableGatewayFactory as TableFactory;
 use StaticGenerator\Template;
 use StaticGenerator\Config;
 
 $app = \Directus\Application\Application::getInstance();
 
-$templateStorageAdapter = new Filesystem( new Local( Config::getTemplateStoragePath() ) );
+$templateStorageAdapter = new Filesystem( new Local( Template::getTemplateStoragePath() ) );
+
+
+// * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1
+$app->get('/cron', function () use ($app, $templateStorageAdapter) {    
+    
+    if( ! Config::readyToGenerate()) {
+        die('Not ready to generate.');
+    }    
+    
+    $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  Config::getGenerationOutputDirectory())); 
+    Template::generateSite($templateStorageAdapter, $outputStorageAdapter);
+    
+    die('Site successfully generated.');
+});
 
 /**************************
  * GET                    *
@@ -28,7 +42,7 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
         if( $templates) {
             foreach($templates as $template) {
                
-                $directoryTree = array_merge_recursive($directoryTree, makeTree(explode('/', $template->filePath . ':::' . $template->id)));
+                $directoryTree = array_merge_recursive($directoryTree, directusMakeTree(explode('/', $template->filePath . ':::' . $template->id)));
                 $filePathParts = explode('/', $template->filePath);
                 
                 $data[] = [              
@@ -38,14 +52,19 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
                     'fileName' => array_pop($filePathParts),
                     'contents' => $template->contents,
                     'exists' => $template->exists(),
-                    'hasDirectoryTree' => false,
                 ];
             }
         }
 
         $data[] = [
             'hasDirectoryTree' => true,
-            'directoryTree' => toUL($directoryTree),
+            'directoryTree' => directusToUL($directoryTree),
+        ];
+        
+        $data[] = [
+            'hasConfig' => true,
+            'generationMethod' => Config::getGenerationMethod(),
+            'generationOutputDirectory' => Config::getGenerationOutputDirectory(),
         ];
 
         return $app->response($data);
@@ -72,36 +91,28 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
         /**
          * Generate site
          */
-        if($app->request()->post('generate')) {
-            
-            $outputStorageAdapter = new Filesystem( new Local( Config::getOutputStoragePath() ) );
-            $contents = $outputStorageAdapter->listContents();
-            if($contents) {
-                foreach($contents as $content) {
-                    if(ArrayUtils::get($content, 'type') != 'dir') continue;
+        if($app->request()->post('generationMethod')) {
                     
-                    $outputStorageAdapter->deleteDir(ArrayUtils::get($content, 'path'));
-                }
+            // normalize posted path
+            $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
+            $outputDirectory = implode('/', $outputDirectory);
+
+            if( ! Template::isValidOutputPath($outputDirectory)) {
+                throw new Exception('Please enter a valid ouput path.');
             }
-        
-            $outputStorageAdapter->deleteDir('output');
-            $templates = Template::getAll($templateStorageAdapter);  
+
+            // generate site
+            $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  $outputDirectory) );
+            Template::generateSite($templateStorageAdapter, $outputStorageAdapter);         
             
-            if( $templates) {
-                foreach($templates as $template) {
+            // save settings
+            Config::setGenerationMethod($app->request()->post('generationMethod'));
+            Config::setGenerationOutputDirectory($outputDirectory);
                     
-                    $parsedTemplates = $template->parseTemplate();
-                    
-                    foreach($parsedTemplates as $parsedTemplate) {
-                        $outputStorageAdapter->put(ArrayUtils::get($parsedTemplate, 'routePath'), ArrayUtils::get($parsedTemplate, 'contents'));
-                    }
-                }
-            }
-            
             return $app->response([
                 'success' => true,
-                'message' => 'Site generated.',
-            ]);
+                'message' => 'Site generated in `' . Template::getOutputDirectoryRoot() . '/' .  $outputDirectory . '`',
+            ]); 
         }  
         
         /**
@@ -228,53 +239,3 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorage
         ])->status(400);    
     }
 });
-
-/**
- * Converts filepath flat array to multi-dimensional array
- * 
- * @param array $arr
- * @return multitype:unknown |unknown
- */
-function makeTree($arr) 
-{
-    $part = array_shift($arr);
-    
-    if( ! $arr) {
-        return [$part];
-    }
-    
-    $tree[$part] = makeTree($arr);
-    
-    return $tree;
-}
-
-/**
- * Converts multi-dimensional array to htmls list output
- * 
- * @param string $data
- * @return string
- */
-function toUL($data = false)
-{
-    $response = '<ul>';
-    if (false !== $data) {
-        foreach ($data as $key => $val) {
-            
-            $response .= '<li>';
-            
-            if (! is_array($val)) {
-                list($fileName, $fileId) = explode(':::', $val);
-                $response .= '<a href="#" data-id="' . $fileId . '" class="file">' . $fileName . '</a>'
-                          .  '<i data-id="' . $fileId . '" class="material-icons delete-file">delete</i>'
-                          .  '<i data-id="' . $fileId . '" class="material-icons edit-file">edit</i>';
-            } 
-            
-            else {
-                $response .= $key . ' ' . toUL($val);
-            }
-            $response .= '</li>';
-        }
-    }
-    $response .= '</ul>';
-    return $response;
-}

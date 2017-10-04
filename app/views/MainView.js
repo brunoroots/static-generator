@@ -13,7 +13,8 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	        savedPages: this.collection.savedTemplates.pagesAsJSON(),
 	        savedIncludes: this.collection.savedTemplates.includesAsJSON(),
 	        loadedFiles: this.collection.loadedTemplates.filesAsJSON(),
-	        directoryStructuresAsUL: this.collection.savedTemplates.directoryStructuresAsUL()
+	        directoryStructuresAsUL: this.collection.savedTemplates.directoryStructuresAsUL(),
+	        config: this.collection.savedTemplates.config()
 	      };
 	    },
 	    events: {
@@ -26,10 +27,13 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	        "click #generate": "generateSite"
 	    },    
 	    generateSite: function(e) {
-	    	var self = this;
+	    	var self = this,
+	    		outputDirectory = $('#output-dir').val(),
+	    		generationMethod = $('#generation').val();
 	    	
 			this.model.save({
-				'generate': 'manually'
+				'generationMethod': generationMethod,
+				'outputDirectory': outputDirectory
 			}, {
 				success : function(model, response, options) {
 					Notification.success(response.message);

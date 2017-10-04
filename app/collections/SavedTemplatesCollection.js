@@ -19,7 +19,13 @@ function(app, Backbone, TemplatesModel) {
 			var res = new Backbone.Collection(this.where({
 				hasDirectoryTree: true
 			})).toJSON();
-			return res;
+			return res[0];
+		},
+		config : function() {
+			var res = new Backbone.Collection(this.where({
+				hasConfig: true
+			})).toJSON();
+			return res[0];
 		}
 	});
 

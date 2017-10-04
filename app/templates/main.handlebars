@@ -1,226 +1,226 @@
 <style type="text/css">
 /****************************************/
 #static-generator .sg-menu {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	height: 100%;
-	width: 300px;
-	background-color: #EEEEEE;
-	padding: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 300px;
+    background-color: #EEEEEE;
+    padding: 20px;
 }
 
 #static-generator .sg-menu .generation-container {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	border-top: 1px solid #DDDDDD;
-	padding: 20px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #DDDDDD;
+    padding: 20px;
 }
 
 #static-generator .sg-menu .sg-label {
-	font-weight: 600;
-	font-size: 11px;
-	color: #666666;
-	margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    color: #666666;
+    margin-bottom: 6px;
 }
 
 #static-generator .sg-menu select.generation {
-	width: 100%;
-	height: 40px;
+    width: 100%;
+    height: 40px;
 }
 
 #static-generator .sg-menu button {
-	width: 100%;
-	height: 40px;
-	background-color: #3498DB;
-	border-radius: 2px;
-	margin-top: 20px;
-	color: #FFFFFF;
-	font-weight: 600;
+    width: 100%;
+    height: 40px;
+    background-color: #3498DB;
+    border-radius: 2px;
+    margin-top: 20px;
+    color: #FFFFFF;
+    font-weight: 600;
 }
 
 #static-generator .sg-menu hr {
-	width: 100%;
-	margin: 40px 0;
+    width: 100%;
+    margin: 40px 0;
 }
 /****************************************/
 #static-generator .sg-menu ul {
-	margin: 0px 0px 0px 30px;
-	list-style: none;
-	line-height: 2em;
-	font-family: Arial;
-	color: #999999;
+    margin: 0px 0px 0px 30px;
+    list-style: none;
+    line-height: 2em;
+    font-family: Arial;
+    color: #999999;
 }
 
 #static-generator .sg-menu ul li {
-	font-size: 14px;
-	position: relative;
+    font-size: 14px;
+    position: relative;
 }
 
 #static-generator .sg-menu ul li a {
-	transition: color 200ms ease-in-out 0ms;
-	color: #666666;
+    transition: color 200ms ease-in-out 0ms;
+    color: #666666;
 }
 
 #static-generator .sg-menu ul li a.active, #static-generator .sg-menu ul li a:hover
-	{
-	color: #3498DB;
+    {
+    color: #3498DB;
 }
 
 #static-generator .sg-menu ul li:before {
-	position: absolute;
-	left: -15px;
-	top: 0px;
-	content: '';
-	display: block;
-	border-left: 1px solid #DDDDDD;
-	height: 1em;
-	border-bottom: 1px solid #DDDDDD;
-	width: 10px;
+    position: absolute;
+    left: -15px;
+    top: 0px;
+    content: '';
+    display: block;
+    border-left: 1px solid #DDDDDD;
+    height: 1em;
+    border-bottom: 1px solid #DDDDDD;
+    width: 10px;
 }
 
 #static-generator .sg-menu ul li:after {
-	position: absolute;
-	left: -15px;
-	bottom: -7px;
-	content: '';
-	display: block;
-	border-left: 1px solid #DDDDDD;
-	height: 100%;
+    position: absolute;
+    left: -15px;
+    bottom: -7px;
+    content: '';
+    display: block;
+    border-left: 1px solid #DDDDDD;
+    height: 100%;
 }
 
 #static-generator .sg-menu ul li.root {
-	margin: 0px 0px 0px -30px;
-	font-weight: 600;
-	font-size: 11px;
-	color: #666666;
+    margin: 0px 0px 0px -30px;
+    font-weight: 600;
+    font-size: 11px;
+    color: #666666;
 }
 
 #static-generator .sg-menu ul li.root:before {
-	display: none;
+    display: none;
 }
 
 #static-generator .sg-menu ul li.root:after {
-	display: none;
+    display: none;
 }
 
 #static-generator .sg-menu ul li:last-child:after {
-	display: none;
+    display: none;
 }
 
 #static-generator .sg-menu ul li a.create-new-template,
 #static-generator .create-new-template {
-	margin-top: 10px;
-	margin-left: 30px;
-	color: #3498DB;
-	text-transform: uppercase;
-	font-size: 11px;
-	font-weight: 600;
-	display: block;
+    margin-top: 10px;
+    margin-left: 30px;
+    color: #3498DB;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    display: block;
 }
 /****************************************/
 #static-generator .sg-editor {
-	margin-right: 300px;
+    margin-right: 300px;
 }
 
 #static-generator .template-container {
-	position: relative;
-	padding: 20px;
-	border-top: 1px solid #DDDDDD;
-	background-color: #FFFFFF;
-	color: #666666;
-	width: 100%;
-	white-space: pre-wrap;
-	font-family: monospace;
-	font-size: 14px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 400;
-	line-height: 20px;
-	counter-reset: line;
-	line-height: 0;
-	margin-top: 0;
-	z-index: 1;
+    position: relative;
+    padding: 20px;
+    border-top: 1px solid #DDDDDD;
+    background-color: #FFFFFF;
+    color: #666666;
+    width: 100%;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
+    counter-reset: line;
+    line-height: 0;
+    margin-top: 0;
+    z-index: 1;
 }
 
 #static-generator .template-container input {
-	display: block;
-	width: 100%;
-	min-width: calc(100% - 75px);
-	margin-bottom: 20px;
-	font-family: 'Roboto', sans-serif;
-	font-size: 26px;
-	height: auto;
-	font-weight: 100;
-	border-color: #DDDDDD;
+    display: block;
+    width: 100%;
+    min-width: calc(100% - 75px);
+    margin-bottom: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 26px;
+    height: auto;
+    font-weight: 100;
+    border-color: #DDDDDD;
 }
 
 #static-generator .template-container textarea.editor {
-	display: block;
-	border: none;
-	font-size: 14px;
-	line-height: 20px;
-	min-height: 500px;
-	max-width: 100%;
-	padding: 20px 0 20px 0;
+    display: block;
+    border: none;
+    font-size: 14px;
+    line-height: 20px;
+    min-height: 500px;
+    max-width: 100%;
+    padding: 20px 0 20px 0;
 
 }
 #static-generator .template-container textarea.editor:focus {
-	border: none;
-	box-shadow: none;
+    border: none;
+    box-shadow: none;
 }
 
 #static-generator .template-container input:focus {
-	border-color: #FFFFFF;
+    border-color: #FFFFFF;
 }
 
 #static-generator .template-container div.route {
-	position: relative;
+    position: relative;
 }
 
 #static-generator .template-container div.no-preview {
-	max-width: calc(100% - 76px);
+    max-width: calc(100% - 76px);
 }
 
 #static-generator .template-container div.preview {
-	max-width: calc(100% - 152px);
+    max-width: calc(100% - 152px);
 }
 
 #static-generator .multipage {
-	transition: all 200ms ease-in-out 0ms;
-	position: absolute;
-	top: 14px;
-	right: 14px;
-	font-size: 28px;
-	color: #DDDDDD;
-	cursor: pointer;
+    transition: all 200ms ease-in-out 0ms;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 28px;
+    color: #DDDDDD;
+    cursor: pointer;
 }
 
 #static-generator .multipage.enabled {
-	color: #666666;
+    color: #666666;
 }
 
 #static-generator .multipage:hover, #static-generator .multipage.active
-	{
-	color: #3498DB;
+    {
+    color: #3498DB;
 }
 
 #static-generator .template-container .save,
 #static-generator .template-container .delete, #static-generator .template-container .visibility {
-	transition: color 200ms ease-in-out 0ms;
-	position: absolute;
-	top: 20px;
-	right: 20px;
-	/*background-color: #EEEEEE;*/
-	border: 1px solid #DDDDDD;
-	color: #999999;
-	width: 56px;
-	height: 56px;
-	text-align: center;
-	border-radius: 2px;
+    transition: color 200ms ease-in-out 0ms;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    /*background-color: #EEEEEE;*/
+    border: 1px solid #DDDDDD;
+    color: #999999;
+    width: 56px;
+    height: 56px;
+    text-align: center;
+    border-radius: 2px;
 }
 
 #static-generator .template-container .save {
@@ -230,115 +230,115 @@
 
 #static-generator .template-container .save .material-icons,
 #static-generator .template-container .delete .material-icons, #static-generator .template-container .visibility .material-icons
-	{
-	font-size: 28px;
+    {
+    font-size: 28px;
 }
 
 #static-generator .template-container .save:hover,
 #static-generator .template-container .delete:hover {
-	/*background-color: #E53935;*/
-	color: #E53935;
+    /*background-color: #E53935;*/
+    color: #E53935;
 }
 
 #static-generator .template-container .visibility:hover {
-	/*background-color: #3498DB;*/
-	color: #3498DB;
+    /*background-color: #3498DB;*/
+    color: #3498DB;
 }
 
 #static-generator .template-container .visibility {
-	right: 96px;
+    right: 96px;
 }
 
 #static-generator .template-container span {
-	display: inline-block;
-	line-height: 1.7rem;
-	text-indent: -50px;
-	width: 100%;
-	padding-left: 40px;
-	/*white-space: pre;*/
+    display: inline-block;
+    line-height: 1.7rem;
+    text-indent: -50px;
+    width: 100%;
+    padding-left: 40px;
+    /*white-space: pre;*/
 }
 
 #static-generator .template-container span:before {
-	counter-increment: line;
-	content: counter(line);
-	display: inline-block;
-	border-right: 1px solid #DDDDDD;
-	padding: 0 .5em;
-	margin-right: .5em;
-	color: #CCCCCC;
-	min-width: 18px;
-	text-align: right;
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    border-right: 1px solid #DDDDDD;
+    padding: 0 .5em;
+    margin-right: .5em;
+    color: #CCCCCC;
+    min-width: 18px;
+    text-align: right;
 }
 
 #static-generator .template-container .tag {
-	background-color: #E5F4FF;
-	border-radius: 4px;
-	padding: 1px 1px 2px 1px;
-	margin: 0 2px;
-	color: #3498DB;
-	font-style: normal;
+    background-color: #E5F4FF;
+    border-radius: 4px;
+    padding: 1px 1px 2px 1px;
+    margin: 0 2px;
+    color: #3498DB;
+    font-style: normal;
 }
 
 #static-generator .template-container u {
-	text-decoration: none;
-	color: #CCCCCC;
+    text-decoration: none;
+    color: #CCCCCC;
 }
 /****************************************/
 #static-generator input.tab {
-	display: none;
+    display: none;
 }
 
 #static-generator label {
-	transition: color 200ms ease-in-out 0ms;
-	position: relative;
-	display: inline-block;
-	margin: 10px 0 -4px;
-	padding: 10px 30px 10px 20px;
-	font-weight: 600;
-	text-align: center;
-	color: #999999;
-	border: 1px solid transparent;
-	border-radius: 3px 3px 0 0;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-	max-width: 200px;
-	z-index: 2;
+    transition: color 200ms ease-in-out 0ms;
+    position: relative;
+    display: inline-block;
+    margin: 10px 0 -4px;
+    padding: 10px 30px 10px 20px;
+    font-weight: 600;
+    text-align: center;
+    color: #999999;
+    border: 1px solid transparent;
+    border-radius: 3px 3px 0 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 200px;
+    z-index: 2;
 }
 
 #static-generator label:first-of-type {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 #static-generator label:hover {
-	color: #666666;
-	cursor: pointer;
+    color: #666666;
+    cursor: pointer;
 }
 
 #static-generator label .material-icons {
-	transition: color 200ms ease-in-out 0ms;
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	font-size: 16px;
-	color: #CCCCCC;
-	display: none;
+    transition: color 200ms ease-in-out 0ms;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    color: #CCCCCC;
+    display: none;
 }
 
 #static-generator label .material-icons:hover {
-	color: #E53935;
+    color: #E53935;
 }
 
 #static-generator input.tab:checked+label {
-	color: #666666;
-	border: 1px solid #DDDDDD;
-	border-top: 2px solid #3498DB;
-	border-bottom: 1px solid #FFFFFF;
-	background-color: #FFFFFF;
+    color: #666666;
+    border: 1px solid #DDDDDD;
+    border-top: 2px solid #3498DB;
+    border-bottom: 1px solid #FFFFFF;
+    background-color: #FFFFFF;
 }
 
 #static-generator input.tab:checked+label .material-icons {
-	display: block;
+    display: block;
 }
 
 i.delete-file, i.edit-file {
@@ -347,9 +347,9 @@ i.delete-file, i.edit-file {
 }
 
 #static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked
-	~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked
-	~ #code4, #static-generator #tab5:checked ~ #code5 {
-	/*display: block;*/
+    ~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked
+    ~ #code4, #static-generator #tab5:checked ~ #code5 {
+    /*display: block;*/
 
 }
 /****************************************/
@@ -359,16 +359,21 @@ i.delete-file, i.edit-file {
     <div class="sg-menu">
         <ul>
             <li class="root">TEMPLATE LIBRARY</li>
-        {{#directoryStructuresAsUL}}
-            {{{directoryTree}}}
-        {{/directoryStructuresAsUL}}
+            {{{directoryStructuresAsUL.directoryTree}}}
         </ul>
+  
         <div class="generation-container">
+            <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to your Directus root directory)</div>
+            <input type="text" value="{{config.generationOutputDirectory}}" id="output-dir" name="output-dir" placeholder="i.e - ./generated-website" />
+            <br><br>
             <div class="sg-label">CODE GENERATION</div>
-            <select name="generation" class="generation">
-                <option value="manually" selected="">Manually</option>
-                <option value="frequency">On Frequency</option>
-                <option value="update">On Content Update</option>
+            <select name="generation" id="generation" class="generation">
+                <option value="manually" {{#sgIfCond config.generationMethod 'manually'}}selected{{/sgIfCond}} >Manually</option>
+                <option value="update" {{#sgIfCond config.generationMethod 'update'}}selected{{/sgIfCond}} >On Content Update</option>
+                <option value="frequency-minute" {{#sgIfCond config.generationMethod 'frequency-minute'}}selected{{/sgIfCond}}>On Frequency - Every Minute</option>
+                <option value="frequency-hour" {{#sgIfCond config.generationMethod 'frequency-hour'}}selected{{/sgIfCond}} >On Frequency - Every Hour</option>
+                <option value="frequency-daily" {{#sgIfCond config.generationMethod 'frequency-daily'}}selected{{/sgIfCond}} >On Frequency - Daily</option>
+                <option value="frequency-weekly" {{#sgIfCond config.generationMethod 'frequency-weekly'}}selected{{/sgIfCond}} >On Frequency - Weekly</option>
             </select>
             <button id="generate">GENERATE NOW</button>
         </div>
