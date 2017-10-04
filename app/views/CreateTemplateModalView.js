@@ -16,16 +16,12 @@ function(app, Backbone, ModalView, Notification) {
 		},
 		save : function(e) {
 			this.model.save({
-				'filePath' : this.$('input[name=filePath]').val(),
-				'type' : this.$('select[name=type]').val()
+				'filePath' : this.$('input[name=filePath]').val()
 			}, {
 				success : function(model, response, options) {
 					Notification.success(response.message);
 					Backbone.history.loadUrl(Backbone.history.fragment);
-					$('#modal_container').hide(); // TODO: need an api call
-					// for this; this.close()
-					// only closes the content;
-					// this.container undefined
+					$('#modal_container').hide();  
 				}
 			});
 		}

@@ -6,7 +6,6 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	    template: 'static_generator/app/templates/main',
 	    initialize: function () {
 	      this.listenTo(this.collection.savedTemplates, 'sync', this.render);
-	      this.listenTo(this.collection.savedTemplates, 'sync', this.displayDirTree);
 	      this.collection.savedTemplates.fetch();	
 	    }, 
 	    serialize: function () {
@@ -14,11 +13,8 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	        savedPages: this.collection.savedTemplates.pagesAsJSON(),
 	        savedIncludes: this.collection.savedTemplates.includesAsJSON(),
 	        loadedFiles: this.collection.loadedTemplates.filesAsJSON(),
-	        dirStructureAsUL: this.collection.savedTemplates.dirStructureAsUL()
+	        directoryStructuresAsUL: this.collection.savedTemplates.directoryStructuresAsUL()
 	      };
-	    },
-	    displayDirTree: function() {
-
 	    },
 	    events: {
 	        "click .create-new-template": "createTemplate",
@@ -59,7 +55,6 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 	    	
 	    	tpl.set({selected:true}); 
 	    	this.render();
-	    	this.displayDirTree();
 	        
 	    },    
 	    unloadTemplate: function(e) {
@@ -97,7 +92,6 @@ function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, E
 
 			this.model.save({
 				'id': tpl.get('id'),
-				'type': tpl.get('type'),
 				'contents': $('#loaded-template-content-'+tpl.get('id')).find('textarea.editor').val(),
 				'filePath': tpl.get('file')
 			}, {

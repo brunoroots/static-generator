@@ -13,42 +13,6 @@ $app = \Directus\Application\Application::getInstance();
 
 $templateStorageAdapter = new Filesystem( new Local( Config::getTemplateStoragePath() ) );
 
-function makeTree($arr) 
-{
-    $part = array_shift($arr);
-    
-    if( ! $arr) {
-        return [$part];
-    }
-    
-    $tree[$part] = makeTree($arr);
-    
-    return $tree;
-}
-
-function toUL($data = false, $flatten = false)
-{
-    $response = '<ul>';
-    if (false !== $data) {
-        foreach ($data as $key => $val) {
-            $response .= '<li>';
-            if (! is_array($val)) {
-                $response .= '<a href="#">' . $val . '</a>';
-            } else {
-                if (! $flatten) {
-                    $response .= $key . ' ' . toUL($val);
-                } else {
-                    // pulls the sub array into the current list context
-                    $response .= substr($response, 0, strlen($response) - 5) . toUL($val);
-                }
-            }
-            $response .= '</li>';
-        }
-    }
-    $response .= '</ul>';
-    return $response;
-}
-
 /**************************
  * GET                    *
  **************************/
@@ -64,24 +28,24 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
         if( $templates) {
             foreach($templates as $template) {
                
-                $directoryTree = array_merge_recursive($directoryTree, makeTree(explode('/', $template->filePath)));
-                              
+                $directoryTree = array_merge_recursive($directoryTree, makeTree(explode('/', $template->filePath . ':::' . $template->id)));
+                $filePathParts = explode('/', $template->filePath);
+                
                 $data[] = [              
                     'id' => $template->id,
                     'route' => $template->route,
                     'file' => $template->filePath,
-                    'type' => $template->type,
+                    'fileName' => array_pop($filePathParts),
                     'contents' => $template->contents,
-                    'isPage' => $template->type == 'page',
                     'exists' => $template->exists(),
-                    'hasDirTree' => false,
+                    'hasDirectoryTree' => false,
                 ];
             }
         }
-        //dd($directoryTree);
+
         $data[] = [
-            'hasDirTree' => true,
-            'dirTree' => toUL($directoryTree),
+            'hasDirectoryTree' => true,
+            'directoryTree' => toUL($directoryTree),
         ];
 
         return $app->response($data);
@@ -126,8 +90,6 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             if( $templates) {
                 foreach($templates as $template) {
                     
-                    if($template->type != 'page') continue;
-                    
                     $parsedTemplates = $template->parseTemplate();
                     
                     foreach($parsedTemplates as $parsedTemplate) {
@@ -150,10 +112,6 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             throw new Exception('Please enter a file path.');
         }
         
-        if( ! $app->request()->post('type')) {
-            throw new Exception('Please select a template type.');
-        }
-        
         if ( substr($app->request()->post('filePath'), -5) != '.html') {
             throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
         }
@@ -161,7 +119,6 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
         // instantiate
         $template = new Template($templateStorageAdapter, [
             'filePath' => $app->request()->post('filePath'), 
-            'type' => $app->request()->post('type'),
             'contents' => $app->request()->post('contents'),
         ]);
         
@@ -272,14 +229,52 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorage
     }
 });
 
-function du($c) {
-    echo '<pre>';
-    print_r($c);
-    echo '</pre>';
+/**
+ * Converts filepath flat array to multi-dimensional array
+ * 
+ * @param array $arr
+ * @return multitype:unknown |unknown
+ */
+function makeTree($arr) 
+{
+    $part = array_shift($arr);
+    
+    if( ! $arr) {
+        return [$part];
+    }
+    
+    $tree[$part] = makeTree($arr);
+    
+    return $tree;
 }
 
-
-function dd($c) {
-    du($c);
-    die();
+/**
+ * Converts multi-dimensional array to htmls list output
+ * 
+ * @param string $data
+ * @return string
+ */
+function toUL($data = false)
+{
+    $response = '<ul>';
+    if (false !== $data) {
+        foreach ($data as $key => $val) {
+            
+            $response .= '<li>';
+            
+            if (! is_array($val)) {
+                list($fileName, $fileId) = explode(':::', $val);
+                $response .= '<a href="#" data-id="' . $fileId . '" class="file">' . $fileName . '</a>'
+                          .  '<i data-id="' . $fileId . '" class="material-icons delete-file">delete</i>'
+                          .  '<i data-id="' . $fileId . '" class="material-icons edit-file">edit</i>';
+            } 
+            
+            else {
+                $response .= $key . ' ' . toUL($val);
+            }
+            $response .= '</li>';
+        }
+    }
+    $response .= '</ul>';
+    return $response;
 }

@@ -15,9 +15,9 @@ function(app, Backbone, TemplatesModel) {
 				type : 'include'
 			})).toJSON();
 		},
-		dirStructureAsUL : function() {
+		directoryStructuresAsUL : function() {
 			var res = new Backbone.Collection(this.where({
-				hasDirTree: true
+				hasDirectoryTree: true
 			})).toJSON();
 			return res;
 		}

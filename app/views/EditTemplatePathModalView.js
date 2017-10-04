@@ -10,7 +10,6 @@ function(app, Backbone, ModalView, Notification) {
 			"click .cancel": "cancel"
 		},
 		initialize : function() {
-			console.log(this.model.attributes.file);
 		},
 		serialize : function() {
 			return {
@@ -23,16 +22,12 @@ function(app, Backbone, ModalView, Notification) {
 		save : function(e) {
 			this.model.save({
 				'filePath' : this.$('input[name=filePath]').val(),
-				'type' : this.model.attributes.type,
 				'contents': this.model.attributes.contents
 			}, {
 				success : function(model, response, options) {
 					Notification.success(response.message);
 					Backbone.history.loadUrl(Backbone.history.fragment);
-					$('#modal_container').hide(); // TODO: need an api call
-					// for this; this.close()
-					// only closes the content;
-					// this.container undefined
+					$('#modal_container').hide(); 
 				}
 			});
 		}

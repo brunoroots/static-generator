@@ -17,19 +17,6 @@ class Template {
     private $adapter;
     
     /**
-     * Template types
-     * 
-     * @var array
-     */
-    public static $supportedTemplateTypes = ['page', 'include'];
-    
-    /**
-     * Type of template (`page` or `include`)
-     * @var unknown
-     */
-    private $type;
-    
-    /**
      * File path to template 
      * 
      * @var string
@@ -77,9 +64,8 @@ class Template {
         try {  
             $this->adapter = $adapter;
             
-            // must provide either `type` and `filePath`, or `id`
-            if( ArrayUtils::get($data, 'type') && ArrayUtils::get($data, 'filePath')) {
-                $this->type = ArrayUtils::get($data, 'type');  
+            // must provide `filePath` or `id`
+            if(ArrayUtils::get($data, 'filePath')) {
                 $this->filePath = ArrayUtils::get($data, 'filePath');      
                 $this->id = $this->encodeTemplateId();        
             }
@@ -90,18 +76,17 @@ class Template {
                 $path = $this->decodeTemplateId();
                 $pathParts = explode('/', $path);
                 
-                $this->type = array_shift($pathParts);
                 $this->filePath = implode('/', $pathParts); 
             }
                 
             else {
-                throw new Exception('You must pass either a template `id` or `type` and `filePath`');
+                throw new Exception('You must pass either a template `id` or `filePath`');
             }
               
             $this->contents = ArrayUtils::get($data, 'contents'); 
      
             if( ! $this->contents && $this->exists()) {
-                $this->contents = $this->adapter->read( $this->type . '/' . $this->filePath );
+                $this->contents = $this->adapter->read( $this->filePath );
             }  
             
             $this->route = $this->extractRoute();
@@ -220,7 +205,7 @@ class Template {
             
             foreach(self::getAll($this->adapter) as $template) {
             
-                $source = $twig->getLoader()->getSource($template->type . '/' . $template->filePath);
+                $source = $twig->getLoader()->getSource($template->filePath);
                 
                 // remove directus directives
                 $source = preg_replace('/<!---(.*?)--->/', '', $source);
@@ -395,10 +380,7 @@ class Template {
      */
     public function parseTemplate($templateTokens = [], $routeTokens = [])
     {
-        try {   
-            if( $this->type != 'page') {
-                throw new Exception('Invalid template type.  Must be of type `page`.');
-            }
+        try {  
             
             $tokenMap = [];
             $output = [];
@@ -416,7 +398,7 @@ class Template {
             $compiledPaths = [];
             foreach(self::getAll($this->adapter) as $template) {
                 
-                $source = $twig->getLoader()->getSource($template->type . '/' . $template->filePath);
+                $source = $twig->getLoader()->getSource($template->filePath);
                 
                 // remove directus directives
                 $source = preg_replace('/<!---(.*?)--->/', '', $source);
@@ -435,9 +417,9 @@ class Template {
                     }
                 }
                 
-                $this->adapter->put($template->type . '/' . $template->filePath . '._locked', $twig->getLoader()->getSource($template->type . '/' . $template->filePath));
-                $this->adapter->put($template->type . '/' . $template->filePath, $source);
-                $compiledPaths[] = $template->type . '/' . $template->filePath;
+                $this->adapter->put($template->filePath . '._locked', $twig->getLoader()->getSource($template->filePath));
+                $this->adapter->put($template->filePath, $source);
+                $compiledPaths[] = $template->filePath;
             }
 
             if($data) {
@@ -447,7 +429,7 @@ class Template {
             }
 
             $twig = new \Twig_Environment( new \Twig_Loader_Filesystem( $this->adapter->getAdapter()->getPathPrefix()) );
-            $template = $twig->load($this->type . '/' . $this->filePath);
+            $template = $twig->load($this->filePath);
 
             $directusData['directus'] = $data;
             
@@ -510,32 +492,21 @@ class Template {
      */
     public static function getAll(FlysystemInterface $adapter )
     {
-        try {
-            $directories = self::$supportedTemplateTypes;            
-            $templates = [];
+        try {         
+            $templates = [];                
+            $files = $adapter->listContents('.', true);
+               
+            if( ! $files) return $templates;
             
-            foreach($directories as $dir) {
+            foreach($files as $file) {    
                 
-                $files = $adapter->listContents($dir, true);
-                    
-                if( ! $files) continue;
+                if( ArrayUtils::get($file, 'type') == 'dir') continue;
                 
-                foreach($files as $file) {    
-                    
-                    if( ArrayUtils::get($file, 'type') == 'dir') continue;
-                    
-                    if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
-
-                    $segments = explode(DIRECTORY_SEPARATOR, ArrayUtils::get($file, 'path'));
-                    
-                    array_shift($segments);
-                    $filePath = implode('/', $segments);
-                    
-                    $templates[] = new Template($adapter, [
-                        'filePath' => $filePath,
-                        'type' => $dir,
-                    ]);
-                }
+                if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
+                
+                $templates[] = new Template($adapter, [
+                    'filePath' => ArrayUtils::get($file, 'path'),
+                ]);
             }
        
             return $templates;
@@ -563,11 +534,8 @@ class Template {
             if( ! $decoded) {
                 throw new Exception('Template not found.');
             }
-            
-           $segments = explode('/', $decoded);
-           
-           $template->type = array_shift($segments);
-           $template->filePath = implode('/', $segments);
+                       
+           $template->filePath = $decoded;
            $template->route = $template->extractRoute();
            
            if( ! $template->exists()) {
@@ -575,7 +543,7 @@ class Template {
            }
  
             if( ! $template->contents ) {
-                $template->contents = $template->adapter->read( $template->type . '/' . $template->filePath );
+                $template->contents = $template->adapter->read($template->filePath);
             }  
            
            return $template;
@@ -612,7 +580,7 @@ class Template {
      */
     private function encodeTemplateId()
     {
-        $res = base64_encode($this->type . '/' . $this->filePath);
+        $res = base64_encode($this->filePath);
         $res = str_replace('=', '', $res);
         return $res;
     }

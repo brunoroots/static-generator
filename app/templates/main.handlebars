@@ -359,9 +359,9 @@ i.delete-file, i.edit-file {
     <div class="sg-menu">
         <ul>
             <li class="root">TEMPLATE LIBRARY</li>
-        {{#dirStructureAsUL}}
-            {{{dirTree}}}
-        {{/dirStructureAsUL}}
+        {{#directoryStructuresAsUL}}
+            {{{directoryTree}}}
+        {{/directoryStructuresAsUL}}
         </ul>
         <div class="generation-container">
             <div class="sg-label">CODE GENERATION</div>
@@ -376,7 +376,7 @@ i.delete-file, i.edit-file {
     <div class="sg-editor">
         {{#loadedFiles}}
         <input id="tab-{{id}}" data-id="{{id}}" class="tab" type="radio" {{#if selected}}checked{{/if}} >
-        <label for="tab-{{id}}">{{file}} <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
+        <label for="tab-{{id}}">{{fileName}} <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
         {{/loadedFiles}}
 
         {{#loadedFiles}}

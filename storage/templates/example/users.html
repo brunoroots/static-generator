@@ -1,0 +1,10 @@
+<!--- directus_route: /example/users ---> 
+{% extends "example/includes/base.html" %}
+{% block content %}    
+    <h2>Directus users displayed in `/example/users/index.html`</h2>
+    <ul>
+    {% for user in directus.directus_users("filters[id][gt]=0") %}
+       <li><a href="/example/users/{{ user.id }}">{{ user.email }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}
