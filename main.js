@@ -1,3 +1,11 @@
+// Extend require config to include local path to Ace
+// This path is relative to the baseUrl set in /app/config.js = `/app/`
+require.config({
+  paths: {
+    ace: '../customs/extensions/static_generator/node_modules/ace-builds/src-min'
+  }
+});
+
 define([ 'app', 'backbone', 'core/extensions', './app/models/TemplatesModel',
 		'./app/views/MainView', './app/collections/SavedTemplatesCollection',
 		'./app/collections/LoadedTemplatesCollection', 'core/widgets/widgets',
@@ -27,7 +35,7 @@ function(app, Backbone, Extension, TemplatesModel, MainView,
 					loadedTemplates : new LoadedTemplatesCollection()
 				}
 			});
-						
+
 			this.addNewBtn = new Widgets.ButtonWidget({
 					widgetOptions : {
 						buttonId : 'addBtn',
@@ -35,8 +43,8 @@ function(app, Backbone, Extension, TemplatesModel, MainView,
 						buttonClass : 'primary',
 						buttonText : __t('new_file')
 					},
-			        onClick: function(e){ 
-			        	self.mainView.createTemplate(e); 
+			        onClick: function(e){
+			        	self.mainView.createTemplate(e);
 			        }
 			});
 			this.saveBtn = new Widgets.SaveWidget({
@@ -44,17 +52,17 @@ function(app, Backbone, Extension, TemplatesModel, MainView,
 						basicSave : this.headerOptions.basicSave
 					},
 					enabled : false,
-			        onClick: function(e){ 
-			        	self.mainView.saveTemplate(e); 
+			        onClick: function(e){
+			        	self.mainView.saveTemplate(e);
 			        }
 			});
-			
+
 			this.mainView.initSaveBtn(this.saveBtn);
-				
+
 			this.widgets = [];
 			this.widgets.push(this.addNewBtn);
 			this.widgets.push(this.saveBtn);
-			
+
 			this.setView('#page-content', this.mainView);
 		}
 	});

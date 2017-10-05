@@ -1,9 +1,3 @@
-require.config({
-  paths: {
-    ace: '../customs/extensions/static_generator/app/lib/ace'
-  }
-});
-
 define([ 'app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './CreateTemplateModalView', './EditTemplatePathModalView', 'ace/ace' ],
 
 function(app, Backbone, __t, Extension, Notification, CreateTemplateModalView, EditTemplatePathModalView, ace) {
