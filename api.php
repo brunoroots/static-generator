@@ -13,7 +13,6 @@ $app = \Directus\Application\Application::getInstance();
 
 $templateStorageAdapter = new Filesystem( new Local( Template::getTemplateStoragePath() ) );
 
-
 // * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1
 $app->get('/cron', function () use ($app, $templateStorageAdapter) {    
     

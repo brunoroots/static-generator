@@ -69,7 +69,7 @@ if( ! defined('directusToUL')) {
     
                 if (! is_array($val)) {
                     list($fileName, $fileId) = explode(':::', $val);
-                    $response .= '<a href="#" data-id="' . $fileId . '" class="file">' . $fileName . '</a>'
+                    $response .= '<a href="#" id="file-' . $fileId . '" data-id="' . $fileId . '" class="file">' . $fileName . '</a>'
                         .  '<i data-id="' . $fileId . '" class="material-icons delete-file">delete</i>'
                             .  '<i data-id="' . $fileId . '" class="material-icons edit-file">edit</i>';
                 }

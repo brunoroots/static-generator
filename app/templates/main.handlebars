@@ -255,9 +255,9 @@ i.delete-file, i.edit-file {
             <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to your Directus root directory)</div>
             <input type="text" value="{{config.generationOutputDirectory}}" id="output-dir" name="output-dir" placeholder="i.e - ./generated-website" />
             <br><br>
-            <div class="sg-label">CODE GENERATION</div>
+            <div class="sg-label">AUTOMATIC CODE GENERATION</div>
             <select name="generation" id="generation" class="generation">
-                <option value="manually" {{#sgIfCond config.generationMethod 'manually'}}selected{{/sgIfCond}} >Manually</option>
+                <option value="manually" {{#sgIfCond config.generationMethod 'manually'}}selected{{/sgIfCond}} >Disabled</option>
                 <option value="update" {{#sgIfCond config.generationMethod 'update'}}selected{{/sgIfCond}} >On Content Update</option>
                 <option value="frequency-minute" {{#sgIfCond config.generationMethod 'frequency-minute'}}selected{{/sgIfCond}}>On Frequency - Every Minute</option>
                 <option value="frequency-hour" {{#sgIfCond config.generationMethod 'frequency-hour'}}selected{{/sgIfCond}} >On Frequency - Every Hour</option>

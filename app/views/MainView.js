@@ -53,22 +53,25 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       this.saveBtn = saveBtn;
     },
     loadTemplate: function (e) {
-      var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});
+      var fileId = $(e.target).attr('data-id');
+      var tpl = this.collection.loadedTemplates.findWhere({id: fileId});
       var selected = this.collection.loadedTemplates.findWhere({selected: true});
-
+      
       if (selected) {
         selected.set({selected: false});
       }
 
       if (!tpl) {
-        tpl = this.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});
+        tpl = this.collection.savedTemplates.findWhere({id: fileId});
         this.collection.loadedTemplates.push(tpl);
       }
 
       this.saveBtn.setEnabled(true);
-
+      
       tpl.set({selected: true});
       this.render();
+      
+      $('#file-'+fileId).addClass('active');
     },
     unloadTemplate: function (e) {
       var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});
