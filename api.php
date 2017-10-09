@@ -90,7 +90,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
         /**
          * Generate site
          */
-        if($app->request()->post('generationMethod')) {
+        if($app->request()->post('generateSite')) {
                     
             // normalize posted path
             $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
@@ -103,6 +103,25 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             // generate site
             $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  $outputDirectory) );
             Template::generateSite($templateStorageAdapter, $outputStorageAdapter);         
+                    
+            return $app->response([
+                'success' => true,
+                'message' => 'Site generated in `' . Template::getOutputDirectoryRoot() . '/' .  $outputDirectory . '`',
+            ]); 
+        } 
+                   
+        /**
+         * Update auto-generation settings
+         */
+        if($app->request()->post('updateGenerationSettings')) {
+                    
+            // normalize posted path
+            $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
+            $outputDirectory = implode('/', $outputDirectory);
+
+            if( ! Template::isValidOutputPath($outputDirectory)) {
+                throw new Exception('Please enter a valid ouput path.');
+            }       
             
             // save settings
             Config::setGenerationMethod($app->request()->post('generationMethod'));
@@ -110,7 +129,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
                     
             return $app->response([
                 'success' => true,
-                'message' => 'Site generated in `' . Template::getOutputDirectoryRoot() . '/' .  $outputDirectory . '`',
+                'message' => 'Generation settings updated.',
             ]); 
         }  
         

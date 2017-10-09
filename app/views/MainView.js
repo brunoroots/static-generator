@@ -32,15 +32,31 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       'click i.edit-file': 'editTemplatePath',
       'click .close-tab': 'unloadTemplate',
       'click .tab, .file': 'loadTemplate',
-      'click #generate': 'generateSite'
+      'click #generate': 'generateSite',
+      'change #generation': 'updateGenerationMethod'
+    },
+    updateGenerationMethod: function() {
+        var self = this;
+        var outputDirectory = $('#output-dir').val();
+        var generationMethod = $('#generation').val();
+
+        this.model.save({
+          updateGenerationSettings: true,
+          generationMethod: generationMethod,
+          outputDirectory: outputDirectory
+        }, {
+          success: function (model, response) {
+            Notification.success(response.message);
+            self.model.unset('generate');
+          }
+        });
     },
     generateSite: function () {
       var self = this;
       var outputDirectory = $('#output-dir').val();
-      var generationMethod = $('#generation').val();
 
       this.model.save({
-        generationMethod: generationMethod,
+        generateSite: true,
         outputDirectory: outputDirectory
       }, {
         success: function (model, response) {
