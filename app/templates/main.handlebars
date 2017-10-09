@@ -201,18 +201,16 @@ i.delete-file, i.edit-file {
     height: 100%;
 }
 
-#static-generator .sg-menu ul li.root {
+#static-generator .sg-menu>ul>li {
     margin: 0px 0px 0px -30px;
     font-weight: 600;
-    font-size: 11px;
-    color: #666666;
 }
 
-#static-generator .sg-menu ul li.root:before {
+#static-generator .sg-menu>ul>li:before {
     display: none;
 }
 
-#static-generator .sg-menu ul li.root:after {
+#static-generator .sg-menu>ul>li:after {
     display: none;
 }
 
@@ -246,10 +244,7 @@ i.delete-file, i.edit-file {
         {{/loadedFiles}}
     </div>
     <div class="sg-menu">
-        <ul>
-            <li class="root">TEMPLATE LIBRARY</li>
-            {{{directoryStructuresAsUL.directoryTree}}}
-        </ul>
+        {{{directoryStructuresAsUL.directoryTree}}}
 
         <div class="generation-container">
             <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to your Directus root directory)</div>
