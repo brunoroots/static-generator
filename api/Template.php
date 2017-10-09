@@ -503,7 +503,7 @@ class Template {
                 
                 if( ArrayUtils::get($file, 'type') == 'dir') continue;
                 
-                if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
+                //if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
                 
                 $templates[] = new Template($adapter, [
                     'filePath' => ArrayUtils::get($file, 'path'),

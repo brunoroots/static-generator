@@ -142,7 +142,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
         }
         
         if ( substr($app->request()->post('filePath'), -5) != '.html') {
-            throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
+            //throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
         }
         
         // instantiate
@@ -189,7 +189,7 @@ $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAda
         }
         
         if ( substr($app->request()->post('filePath'), -5) != '.html') {
-            throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
+            //throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
         }
         
         // instantiate template
