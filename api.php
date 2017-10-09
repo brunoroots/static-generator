@@ -161,6 +161,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
         return $app->response([
             'success' => true,
             'message' => 'Request successfully processed.',
+            'id' => $template->id,
         ]);
     }
     

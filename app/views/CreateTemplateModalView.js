@@ -18,6 +18,9 @@ define(['app', 'backbone', 'core/Modal', 'core/notification'], function (app, Ba
           Notification.success(response.message);
           Backbone.history.loadUrl(Backbone.history.fragment);
           $('#modal_container').hide();
+          setTimeout(function(){
+        	  $('#file-'+response.id).click();
+          }, 1000);
         }
       });
     }
