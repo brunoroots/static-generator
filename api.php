@@ -97,7 +97,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             $outputDirectory = implode('/', $outputDirectory);
 
             if( ! Template::isValidOutputPath($outputDirectory)) {
-                throw new Exception('Please enter a valid ouput path.');
+                throw new Exception('Please enter a valid output path.');
             }
 
             // generate site
@@ -120,7 +120,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
             $outputDirectory = implode('/', $outputDirectory);
 
             if( ! Template::isValidOutputPath($outputDirectory)) {
-                throw new Exception('Please enter a valid ouput path.');
+                throw new Exception('Please enter a valid output path.');
             }       
             
             // save settings

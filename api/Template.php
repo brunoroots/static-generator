@@ -491,7 +491,7 @@ class Template {
      * @return array
      * @throws Exception
      */
-    public static function getAll(FlysystemInterface $adapter )
+    public static function getAll(FlysystemInterface $adapter, $includeRoutableOnly = false )
     {
         try {         
             $templates = [];                
@@ -507,9 +507,13 @@ class Template {
                 
                 //if(substr(ArrayUtils::get($file, 'basename'), -5) != '.html') continue;
                 
-                $templates[] = new Template($adapter, [
+                $template = new Template($adapter, [
                     'filePath' => ArrayUtils::get($file, 'path'),
                 ]);
+                
+                if( $includeRoutableOnly && ! $template->route) continue;
+                
+                $templates[] = $template;
             }
        
             return $templates;
@@ -586,7 +590,7 @@ class Template {
             }
         }
         
-        $templates = self::getAll($templateStorageAdapter);
+        $templates = self::getAll($templateStorageAdapter, true);
         
         if( $templates) {
             foreach($templates as $template) {
