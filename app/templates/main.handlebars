@@ -87,7 +87,18 @@
     display: none;
 }
 
-#static-generator label .material-icons:hover {
+#static-generator .material-icons {
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-left: 4px;
+    display:none;
+}
+
+#static-generator li:hover>i {
+    display: inline-block;
+}
+
+#static-generator .material-icons:hover {
     color: #E53935;
 }
 
@@ -203,7 +214,7 @@ i.delete-file, i.edit-file {
 
 #static-generator .sg-menu>ul>li {
     margin: 0px 0px 0px -30px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 #static-generator .sg-menu>ul>li:before {
