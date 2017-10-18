@@ -13,17 +13,28 @@ $app = \Directus\Application\Application::getInstance();
 
 $templateStorageAdapter = new Filesystem( new Local( Template::getTemplateStoragePath() ) );
 
-// * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1
+/*********************************************************************************************************
+ * CRON HANDLER                                                                                          *
+ * for frequency based generation.                                                                       *
+ * To enable on *nix systems, create a cron job using:                                                   *
+ *   * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1        *
+ *********************************************************************************************************/
 $app->get('/cron', function () use ($app, $templateStorageAdapter) {    
     
-    if( ! Config::readyToGenerate()) {
-        die('Not ready to generate.');
-    }    
+    try {
+        if( ! Config::readyToGenerate()) {
+            die('Not ready to generate.');
+        }    
+        
+        $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  Config::getGenerationOutputDirectory())); 
+        Template::generateSite($templateStorageAdapter, $outputStorageAdapter);
+        
+        die('Site successfully generated.');
+    }
     
-    $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  Config::getGenerationOutputDirectory())); 
-    Template::generateSite($templateStorageAdapter, $outputStorageAdapter);
-    
-    die('Site successfully generated.');
+    catch (Exception $e) {
+        die($e->getMessage());
+    }
 });
 
 /**************************
@@ -31,13 +42,11 @@ $app->get('/cron', function () use ($app, $templateStorageAdapter) {
  **************************/
 $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {    
 
-    try {       
-        
-        $templates = Template::getAll($templateStorageAdapter);
-        
-        $data = [];
-        
+    try {               
+        $templates = Template::getAll($templateStorageAdapter);        
+        $data = [];        
         $directoryTree = [];
+        
         if( $templates) {
             foreach($templates as $template) {
                
@@ -85,8 +94,7 @@ $app->get('/templates/?', function () use ($app, $templateStorageAdapter) {
  **************************/
 $app->post('/templates', function () use ($app, $templateStorageAdapter) {
 
-    try {  
-                   
+    try {                     
         /**
          * Generate site
          */
@@ -181,8 +189,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
  **************************/
 $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAdapter) {
 
-    try {     
-        
+    try {    
         // validation
         if( ! $app->request()->post('filePath')) {
             throw new Exception('Please enter a file path.');
@@ -238,7 +245,6 @@ $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAda
 $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorageAdapter) { 
 
     try {
-        
         $template = Template::getById($templateStorageAdapter, $id);
         $template->delete();
     
