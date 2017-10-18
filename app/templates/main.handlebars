@@ -87,8 +87,23 @@
     display: none;
 }
 
-#static-generator label .material-icons:hover {
+#static-generator .material-icons {
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-left: 4px;
+    display:none;
+}
+
+#static-generator li:hover>i {
+    display: inline-block;
+}
+
+#static-generator .material-icons.delete-file:hover {
     color: #E53935;
+}
+
+#static-generator .material-icons.edit-file:hover {
+    color: #3498DB;
 }
 
 #static-generator input.tab:checked+label {
@@ -159,9 +174,9 @@ i.delete-file, i.edit-file {
 #static-generator .sg-menu ul {
     margin: 0px 0px 0px 30px;
     list-style: none;
-    line-height: 2em;
+    line-height: 1.5em;
     font-family: Arial;
-    color: #999999;
+    color: #BBBBBB;
 }
 
 #static-generator .sg-menu ul li {
@@ -186,7 +201,7 @@ i.delete-file, i.edit-file {
     content: '';
     display: block;
     border-left: 1px solid #DDDDDD;
-    height: 1em;
+    height: 0.8em;
     border-bottom: 1px solid #DDDDDD;
     width: 10px;
 }
@@ -203,7 +218,7 @@ i.delete-file, i.edit-file {
 
 #static-generator .sg-menu>ul>li {
     margin: 0px 0px 0px -30px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 #static-generator .sg-menu>ul>li:before {
