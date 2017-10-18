@@ -1,5 +1,5 @@
 /* global $ */
-define(['app', 'backbone', 'core/Modal', 'core/notification'], function (app, Backbone, ModalView, Notification) {
+define(['app', 'backbone', 'core/Modal', 'core/notification', 'ace/ace'], function (app, Backbone, ModalView, Notification, ace) {
   return ModalView.extend({
     prefix: 'customs/extensions/',
     template: 'static_generator/app/templates/createTemplateModalView',
@@ -20,6 +20,10 @@ define(['app', 'backbone', 'core/Modal', 'core/notification'], function (app, Ba
           $('#modal_container').hide();
           setTimeout(function(){
         	  $('#file-'+response.id).click();
+              var editor = ace.edit('editor-'+response.id);
+              editor.focus(); //To focus the ace editor
+              var n = editor.getSession().getValue().split("\n").length; // To count total no. of lines
+              editor.gotoLine(n);
           }, 1000);
         }
       });
