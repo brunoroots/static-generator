@@ -136,7 +136,6 @@ class Template {
     public function save()
     {
         try {           
-                        
             $path = $this->decodeTemplateId($this->id);            
             $this->adapter->put($path, $this->contents);
         }
@@ -381,8 +380,7 @@ class Template {
      */
     public function parseTemplate($templateTokens = [], $routeTokens = [])
     {
-        try {  
-            
+        try {              
             $tokenMap = [];
             $output = [];
             
@@ -397,8 +395,8 @@ class Template {
             $twig = new \Twig_Environment( new \Twig_Loader_Filesystem( $this->adapter->getAdapter()->getPathPrefix()) );
             
             $compiledPaths = [];
-            foreach(self::getAll($this->adapter) as $template) {
-                
+            foreach(self::getAll($this->adapter) as $template) {     
+                           
                 $source = $twig->getLoader()->getSource($template->filePath);
                 
                 // remove directus directives
@@ -413,8 +411,7 @@ class Template {
                 if($data) {
                     foreach($data as $key => $val) {
                         if( $key == 'hash') continue;
-                        $source = str_replace('directus.' . $key, 'directus.' . ArrayUtils::get($val, 'hash'), $source);                    
-                        
+                        $source = str_replace('directus.' . $key, 'directus.' . ArrayUtils::get($val, 'hash'), $source);     
                     }
                 }
                 
@@ -435,14 +432,13 @@ class Template {
             $directusData['directus'] = $data;
             
             if($this->isMultiPage) {
-
                 $routeItems = $this->queryData([$routeTokens]);
                 $routeItems = array_shift($routeItems);
                 $hash = ArrayUtils::get($routeItems, 'hash');
                 ArrayUtils::remove($routeItems, 'hash');
                 
                 foreach($routeItems as $key => $val) {
-
+                    
                     $directusData['directus'][$hash] = $val;
                     $output[] = [
                         'contents' => $template->render($directusData),
@@ -454,11 +450,13 @@ class Template {
                 }
             }
 
-            else {
-                           
+            else {         
+                $fileType = array_pop(explode('.', $this->route));
+                $fileType = $fileType == $this->route ? 'html' : $fileType;
+                        
                 $output[] = [
                     'contents' => $template->render($directusData),
-                    'routePath' => $this->route . '/index.html',
+                    'routePath' => $this->route . ( $fileType == 'html' ? '/index.html' : '' ),
                 ];
             }
            
@@ -583,6 +581,12 @@ class Template {
         }  
     }
     
+    /**
+     * Generate site
+     * 
+     * @param FlysystemInterface $templateStorageAdapter
+     * @param FlysystemInterface $outputStorageAdapter
+     */
     public static function generateSite(FlysystemInterface $templateStorageAdapter, FlysystemInterface $outputStorageAdapter)
     {
         $contents = $outputStorageAdapter->listContents();
@@ -594,7 +598,6 @@ class Template {
         }
         
         $templates = self::getAll($templateStorageAdapter, true);
-        
         if( $templates) {
             foreach($templates as $template) {
                 $parsedTemplates = $template->parseTemplate();
