@@ -12,19 +12,22 @@ define(['app', 'backbone', 'core/Modal', 'core/notification', 'ace/ace'], functi
     },
     save: function () {
       this.model.save({
-        filePath: this.$('input[name=filePath]').val()
+          id: null,
+          contents: null,
+          filePath: this.$('input[name=filePath]').val()
       }, {
         success: function (model, response) {
+        	
           Notification.success(response.message);
           Backbone.history.loadUrl(Backbone.history.fragment);
           $('#modal_container').hide();
           setTimeout(function(){
         	  $('#file-'+response.id).click();
               var editor = ace.edit('editor-'+response.id);
-              editor.focus(); //To focus the ace editor
-              var n = editor.getSession().getValue().split("\n").length; // To count total no. of lines
+              editor.focus(); 
+              var n = editor.getSession().getValue().split("\n").length;  
               editor.gotoLine(n);
-          }, 1000);
+          }, 2000);
         }
       });
     }

@@ -7,6 +7,10 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     initialize: function () {
       this.listenTo(this.collection.savedTemplates, 'sync', this.render);
       this.collection.savedTemplates.fetch();
+      var self = this;
+      setInterval(function(){ 
+    	  self.saveAll();
+       }, 30000);
     },
     serialize: function () {
       return {
@@ -18,11 +22,21 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       };
     },
     afterRender: function () {
-      var tpl = this.collection.loadedTemplates.findWhere({selected: true});
+      var tpl = this.collection.loadedTemplates.findWhere({selected: true}),
+      	  self = this;
 
       if (tpl) {
         this.editor = ace.edit('editor-' + tpl.get('id'));
         this.editor.session.setMode('ace/mode/twig');
+        this.editor.templateId = tpl.get('id');
+        
+        this.editor.getSession().on('change', function(e) {
+        	var selected = self.collection.loadedTemplates.findWhere({selected: true});
+        	selected.set({'modified':true});
+        	selected.set({'contents':self.editor.getValue()});
+            $('#label-'+selected.get('id')).addClass('modified');
+            self.saveBtn.setEnabled(true);
+        });
       }
     },
     events: {
@@ -31,7 +45,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       'click i.delete-file': 'deleteTemplate',
       'click i.edit-file': 'editTemplatePath',
       'click .close-tab': 'unloadTemplate',
-      'click .tab, .file': 'loadTemplate',
+      'click .tab-link, .file': 'loadTemplate',
       'click #generate': 'generateSite',
       'change #generation': 'updateGenerationMethod'
     },
@@ -72,8 +86,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       var fileId = $(e.target).attr('data-id');
       var tpl = this.collection.loadedTemplates.findWhere({id: fileId});
       var selected = this.collection.loadedTemplates.findWhere({selected: true});
-      
+    
       if (selected) {
+    	selected.set({contents: this.editor.getValue()});
         selected.set({selected: false});
       }
 
@@ -82,38 +97,70 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         this.collection.loadedTemplates.push(tpl);
       }
 
-      this.saveBtn.setEnabled(true);
+      if(tpl.get('modified')) {
+    	  this.saveBtn.setEnabled(true);
+      } else {
+    	  this.saveBtn.setEnabled(false);
+      }
       
       tpl.set({selected: true});
       this.render();
       
       $('#file-'+fileId).addClass('active');
     },
-    unloadTemplate: function (e) {
-      var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')});
+    unloadTemplate: function (e) {    
+      var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
+      	  self = this;
 
-      if (tpl) {
-        this.collection.loadedTemplates.remove(tpl);
-        tpl = this.collection.loadedTemplates.first();
-        var selected = this.collection.loadedTemplates.findWhere({selected: true});
+      app.router.openModal({type: 'yesno', text: __t('Save file?'), callback: function (res) {
+          if ( ! tpl) return false;
+        	  
+    	  if(res == 'yes') { // save and close
+    		tpl.set({contents: self.editor.getValue()});
+            self.model.save({
+                id: tpl.get('id'),
+                contents: self.editor.getValue(),
+                filePath: tpl.get('file')
+              }, {
+                success: function (model, response) {
+                    Notification.success(response.message);              	  
+                    self.collection.loadedTemplates.remove(tpl);
+                    tpl = self.collection.loadedTemplates.first();
+                    var selected = self.collection.loadedTemplates.findWhere({selected: true});
 
-        if (!selected && tpl) {
-          tpl.set({selected: true});
-        }
+                    if (!selected && tpl) {
+                      tpl.set({selected: true});
+                    }
 
-        if (this.collection.loadedTemplates.length === 0) {
-          this.saveBtn.setEnabled(false);
-        }
+                    self.render();
+                }
+              });   		  
+    	  } else { // close, don't save
+            self.collection.loadedTemplates.remove(tpl);
+            tpl = self.collection.loadedTemplates.first();
+            var selected = self.collection.loadedTemplates.findWhere({selected: true});
 
-        this.render();
-      }
+            if (!selected && tpl) {
+              tpl.set({selected: true});
+            }
+
+            self.render();
+    	  }
+    	  
+    	  if(tpl) {
+    		  tpl.set({modified:false});
+    	  }
+          self.saveBtn.setEnabled(false);
+      }});
     },
     createTemplate: function () {
+      this.saveAll();
       app.router.openViewInModal(new CreateTemplateModalView({
         model: this.model
       }));
     },
     editTemplatePath: function (e) {
+      this.saveAll();
       var tpl = this.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});
 
       app.router.openViewInModal(new EditTemplatePathModalView({
@@ -121,7 +168,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }));
     },
     saveTemplate: function () {
-      var tpl = this.collection.loadedTemplates.findWhere({selected: true});
+      var tpl = this.collection.loadedTemplates.findWhere({selected: true}),
+      	  self = this;;
+      tpl.set({contents: this.editor.getValue()});
 
       this.model.save({
         id: tpl.get('id'),
@@ -130,14 +179,33 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }, {
         success: function (model, response) {
           Notification.success(response.message);
-          Backbone.history.loadUrl(Backbone.history.fragment);
-            // TODO: need to update models,
-            // but don't really want to refresh
-            // unsaved content in other tabs
+          tpl.set('modified', false);
+          self.saveBtn.setEnabled(false);
+          self.render();
         }
       });
     },
+    saveAll: function() {
+      var self = this;
+  	  if(self.collection.loadedTemplates) {
+  		  self.collection.loadedTemplates.each(function(model){
+  			  if(model.get('modified')) {
+		              model.save({
+		                id: model.get('id'),
+		                contents: model.get('contents'),
+		                filePath: model.get('file')
+		              }, {
+		                success: function (model, response) {
+		    				model.set({'modified':false});
+		    				self.saveBtn.setEnabled(false);
+		                    self.render();
+		              }});
+  			  }
+  		  });
+  	  }
+    },
     deleteTemplate: function (e) {
+      this.saveAll();
       var self = this;
       app.router.openModal({type: 'confirm', text: __t('Are you sure you want to delete this file?'), callback: function () {
         var tpl = self.collection.savedTemplates.findWhere({id: $(e.target).attr('data-id')});
@@ -146,9 +214,6 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
           success: function (model, response) {
             Notification.success(response.message);
             Backbone.history.loadUrl(Backbone.history.fragment);
-              // TODO: need to update models,
-              // but don't really want to refresh
-              // unsaved content in other tabs
           }
         });
       }});
