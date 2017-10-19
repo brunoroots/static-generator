@@ -3,6 +3,9 @@ define(['app', 'backbone', 'core/Modal', 'core/notification', 'ace/ace'], functi
   return ModalView.extend({
     prefix: 'customs/extensions/',
     template: 'static_generator/app/templates/createTemplateModalView',
+    afterRender: function () {
+    	$('input[name=filePath]').focus();
+    },
     events: {
       'click .save': 'save',
       'click .cancel': 'cancel'
