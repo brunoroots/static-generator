@@ -47,7 +47,32 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       'click .close-tab': 'unloadTemplate',
       'click .tab-link, .file': 'loadTemplate',
       'click #generate': 'generateSite',
+      'click #edit-output-dir': 'editOutputDir',
+      'click #save-output-dir': 'saveOutputDir',
       'change #generation': 'updateGenerationMethod'
+    },
+    editOutputDir: function() {
+    	$('#save-output-dir, #output-dir').removeClass('hidden');
+    	$('#output-dir-text, #edit-output-dir').addClass('hidden');
+    	$('#output-dir').focus();
+    },
+    saveOutputDir: function() {
+        var self = this;
+        var outputDirectory = $('#output-dir').val();
+        var generationMethod = $('#generation').val();
+
+        this.model.save({
+          updateGenerationSettings: true,
+          generationMethod: generationMethod,
+          outputDirectory: outputDirectory
+        }, {
+          success: function (model, response) {
+            Notification.success(response.message);
+        	$('#save-output-dir, #output-dir').addClass('hidden');
+        	$('#output-dir-text, #edit-output-dir').removeClass('hidden');
+        	$('#output-dir-text').val(outputDirectory);
+          }
+        });
     },
     updateGenerationMethod: function() {
         var self = this;

@@ -266,7 +266,9 @@ i.delete-file, i.edit-file {
 
         <div class="generation-container">
             <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to your Directus root directory)</div>
-            <input type="text" value="{{config.generationOutputDirectory}}" id="output-dir" name="output-dir" placeholder="i.e - ./generated-website" />
+            <input type="text" value="{{config.generationOutputDirectory}}" class="hidden"  id="output-dir" name="output-dir" placeholder="i.e - ./generated-website" />
+            <input type="text" disabled id="output-dir-text"  value="{{config.generationOutputDirectory}}">
+            <button id="edit-output-dir">Edit</button><button id="save-output-dir" class="hidden">Save</button>
             <br><br>
             <div class="sg-label">AUTOMATIC CODE GENERATION</div>
             <select name="generation" id="generation" class="generation">
