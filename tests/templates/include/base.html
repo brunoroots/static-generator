@@ -9,7 +9,7 @@
         <h2>Directus users displayed in base.html</h2>
         <ul>
         {% for user in directus.directus_users %}
-           <li><a href="/example/users/{{ user.id }}">{{ user.email }}</a></li>
+           <li><a href="/users/{{ user.id }}">{{ user.email }}</a></li>
         {% endfor %}
         </ul>
         <div id="content">{% block content %}{% endblock %}</div>

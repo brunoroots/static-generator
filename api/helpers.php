@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 
 if( ! defined('du')) {
@@ -40,13 +40,13 @@ if( ! defined('directusMakeTree')) {
     function directusMakeTree($arr)
     {
         $part = array_shift($arr);
-    
+
         if( ! $arr) {
             return [$part];
         }
-    
+
         $tree[$part] = directusMakeTree($arr);
-    
+
         return $tree;
     }
 }
@@ -64,16 +64,16 @@ if( ! defined('directusToUL')) {
         $response = '<ul>';
         if (false !== $data) {
             foreach ($data as $key => $val) {
-    
+
                 $response .= '<li>';
-    
+
                 if (! is_array($val)) {
                     list($fileName, $fileId) = explode(':::', $val);
                     $response .= '<a href="#" id="file-' . $fileId . '" data-id="' . $fileId . '" class="file">' . $fileName . '</a>'
                         .  '<i data-id="' . $fileId . '" class="material-icons delete-file">delete</i>'
                             .  '<i data-id="' . $fileId . '" class="material-icons edit-file">edit</i>';
                 }
-    
+
                 else {
                     $response .= $key . ' ' . directusToUL($val);
                 }
