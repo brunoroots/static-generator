@@ -20,6 +20,7 @@
 
 #static-generator .tabs {
 	padding: 10px 20px 0;
+    height: 47px;
 }
 
 #static-generator .editor {
@@ -116,6 +117,11 @@
 
 #static-generator input.tab:checked+label .material-icons {
     display: block;
+    margin-top: -1px;
+}
+
+#static-generator input.tab:checked+label .material-icons:hover {
+    color: #666666;
 }
 
 i.delete-file, i.edit-file {
@@ -161,7 +167,7 @@ i.delete-file, i.edit-file {
     height: 40px;
     background-color: #3498DB;
     border-radius: 2px;
-    margin-top: 20px;
+    margin-top: 10px;
     color: #FFFFFF;
     font-weight: 600;
 }
@@ -265,11 +271,11 @@ i.delete-file, i.edit-file {
         {{{directoryStructuresAsUL.directoryTree}}}
 
         <div class="generation-container">
-            <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to your Directus root directory)</div>
-            <input type="text" value="{{config.generationOutputDirectory}}" class="hidden"  id="output-dir" name="output-dir" placeholder="i.e - ./generated-website" />
+            <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to Directus root)</div>
+            <input type="text" value="{{config.generationOutputDirectory}}" class="hidden"  id="output-dir" name="output-dir" placeholder="eg: ./output" />
             <input type="text" disabled id="output-dir-text"  value="{{config.generationOutputDirectory}}">
-            <button id="edit-output-dir">Edit</button><button id="save-output-dir" class="hidden">Save</button>
-            <br><br>
+            <button id="edit-output-dir">EDIT</button><button id="save-output-dir" class="hidden">SAVE</button>
+            <br><br><br>
             <div class="sg-label">AUTOMATIC CODE GENERATION</div>
             <select name="generation" id="generation" class="generation">
                 <option value="manually" {{#sgIfCond config.generationMethod 'manually'}}selected{{/sgIfCond}} >Disabled</option>
