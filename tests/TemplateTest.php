@@ -9,7 +9,7 @@ use Directus\Database\TableGatewayFactory as TableFactory;
 use Directus\Database\TableGateway\RelationalTableGateway;
 use StaticGenerator\Template;
 
-// run out of `static_generator`: ../../../vendor/bin/phpunit
+// run out of `static-generator`: ../../../vendor/bin/phpunit
 class TemplateTest extends TestCase
 {
 

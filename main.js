@@ -4,7 +4,7 @@
 // This path is relative to the baseUrl set in /app/config.js = `/app/`
 require.config({
   paths: {
-    ace: '../customs/extensions/static_generator/node_modules/ace-builds/src-min'
+    ace: '../customs/extensions/static-generator/node_modules/ace-builds/src-min'
   }
 });
 
@@ -79,7 +79,7 @@ define([
   });
 
   return {
-    id: 'static_generator',
+    id: 'static-generator',
     title: 'Static Generator',
     Router: Router
   };

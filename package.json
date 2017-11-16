@@ -1,5 +1,5 @@
 {
-  "name": "static_generator",
+  "name": "static-generator",
   "version": "1.0.0",
   "description": "Directus extension for the static website generator",
   "main": "main.js",
