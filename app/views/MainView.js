@@ -8,9 +8,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       this.listenTo(this.collection.savedTemplates, 'sync', this.render);
       this.collection.savedTemplates.fetch();
       var self = this;
-      setInterval(function(){
+      setInterval(function () {
     	  self.saveAll();
-       }, 30000);
+      }, 30000);
     },
     serialize: function () {
       return {
@@ -26,16 +26,18 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       	  self = this;
 
       if (tpl) {
+        ace.config.set('themePath', '../customs/extensions/static_generator/app');
         this.editor = ace.edit('editor-' + tpl.get('id'));
+        this.editor.setTheme('ace/theme/directus');
         this.editor.session.setMode('ace/mode/twig');
         this.editor.templateId = tpl.get('id');
 
-        this.editor.getSession().on('change', function(e) {
+        this.editor.getSession().on('change', function (e) {
         	var selected = self.collection.loadedTemplates.findWhere({selected: true});
-        	selected.set({'modified':true});
-        	selected.set({'contents':self.editor.getValue()});
-            $('#label-'+selected.get('id')).addClass('modified');
-            self.saveBtn.setEnabled(true);
+        	selected.set({modified: true});
+        	selected.set({contents: self.editor.getValue()});
+          $('#label-' + selected.get('id')).addClass('modified');
+          self.saveBtn.setEnabled(true);
         });
       }
     },
@@ -51,44 +53,44 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       'click #save-output-dir': 'saveOutputDir',
       'change #generation': 'updateGenerationMethod'
     },
-    editOutputDir: function() {
+    editOutputDir: function () {
     	$('#save-output-dir, #output-dir').removeClass('hidden');
     	$('#output-dir-text, #edit-output-dir').addClass('hidden');
     	$('#output-dir').focus();
     },
-    saveOutputDir: function() {
-        var self = this;
-        var outputDirectory = $('#output-dir').val();
-        var generationMethod = $('#generation').val();
+    saveOutputDir: function () {
+      var self = this;
+      var outputDirectory = $('#output-dir').val();
+      var generationMethod = $('#generation').val();
 
-        this.model.save({
-          updateGenerationSettings: true,
-          generationMethod: generationMethod,
-          outputDirectory: outputDirectory
-        }, {
-          success: function (model, response) {
-            Notification.success(response.message);
+      this.model.save({
+        updateGenerationSettings: true,
+        generationMethod: generationMethod,
+        outputDirectory: outputDirectory
+      }, {
+        success: function (model, response) {
+          Notification.success(response.message);
         	$('#save-output-dir, #output-dir').addClass('hidden');
         	$('#output-dir-text, #edit-output-dir').removeClass('hidden');
         	$('#output-dir-text').val(outputDirectory);
-          }
-        });
+        }
+      });
     },
-    updateGenerationMethod: function() {
-        var self = this;
-        var outputDirectory = $('#output-dir').val();
-        var generationMethod = $('#generation').val();
+    updateGenerationMethod: function () {
+      var self = this;
+      var outputDirectory = $('#output-dir').val();
+      var generationMethod = $('#generation').val();
 
-        this.model.save({
-          updateGenerationSettings: true,
-          generationMethod: generationMethod,
-          outputDirectory: outputDirectory
-        }, {
-          success: function (model, response) {
-            Notification.success(response.message);
-            self.model.unset('generate');
-          }
-        });
+      this.model.save({
+        updateGenerationSettings: true,
+        generationMethod: generationMethod,
+        outputDirectory: outputDirectory
+      }, {
+        success: function (model, response) {
+          Notification.success(response.message);
+          self.model.unset('generate');
+        }
+      });
     },
     generateSite: function () {
       var self = this;
@@ -122,7 +124,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         this.collection.loadedTemplates.push(tpl);
       }
 
-      if(tpl.get('modified')) {
+      if (tpl.get('modified')) {
     	  this.saveBtn.setEnabled(true);
       } else {
     	  this.saveBtn.setEnabled(false);
@@ -131,36 +133,26 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       tpl.set({selected: true});
       this.render();
 
-      $('#file-'+fileId).addClass('active');
+      $('#file-' + fileId).addClass('active');
     },
     unloadTemplate: function (e) {
       var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
       	  self = this;
 
       app.router.openModal({type: 'yesno', text: __t('Save file?'), callback: function (res) {
-          if ( ! tpl) return false;
+        if (!tpl) {
+          return false;
+        }
 
-    	  if(res == 'yes') { // save and close
+    	  if (res == 'yes') { // save and close
     		tpl.set({contents: self.editor.getValue()});
-            self.model.save({
-                id: tpl.get('id'),
-                contents: self.editor.getValue(),
-                filePath: tpl.get('file')
-              }, {
-                success: function (model, response) {
-                    Notification.success(response.message);
-                    self.collection.loadedTemplates.remove(tpl);
-                    tpl = self.collection.loadedTemplates.first();
-                    var selected = self.collection.loadedTemplates.findWhere({selected: true});
-
-                    if (!selected && tpl) {
-                      tpl.set({selected: true});
-                    }
-
-                    self.render();
-                }
-              });
-    	  } else { // close, don't save
+        self.model.save({
+          id: tpl.get('id'),
+          contents: self.editor.getValue(),
+          filePath: tpl.get('file')
+        }, {
+          success: function (model, response) {
+            Notification.success(response.message);
             self.collection.loadedTemplates.remove(tpl);
             tpl = self.collection.loadedTemplates.first();
             var selected = self.collection.loadedTemplates.findWhere({selected: true});
@@ -170,12 +162,24 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
             }
 
             self.render();
+          }
+        });
+    	  } else { // close, don't save
+        self.collection.loadedTemplates.remove(tpl);
+        tpl = self.collection.loadedTemplates.first();
+        var selected = self.collection.loadedTemplates.findWhere({selected: true});
+
+        if (!selected && tpl) {
+          tpl.set({selected: true});
+        }
+
+        self.render();
     	  }
 
-    	  if(tpl) {
-    		  tpl.set({modified:false});
+    	  if (tpl) {
+    		  tpl.set({modified: false});
     	  }
-          self.saveBtn.setEnabled(false);
+        self.saveBtn.setEnabled(false);
       }});
     },
     createTemplate: function () {
@@ -194,7 +198,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     },
     saveTemplate: function () {
       var tpl = this.collection.loadedTemplates.findWhere({selected: true}),
-      	  self = this;;
+      	  self = this;
       tpl.set({contents: this.editor.getValue()});
 
       this.model.save({
@@ -210,18 +214,18 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         }
       });
     },
-    saveAll: function() {
+    saveAll: function () {
       var self = this;
-  	  if(self.collection.loadedTemplates) {
-  		  self.collection.loadedTemplates.each(function(model){
-  			  if(model.get('modified')) {
+  	  if (self.collection.loadedTemplates) {
+  		  self.collection.loadedTemplates.each(function (model) {
+  			  if (model.get('modified')) {
 		              model.save({
 		                id: model.get('id'),
 		                contents: model.get('contents'),
 		                filePath: model.get('file')
 		              }, {
 		                success: function (model, response) {
-		    				model.set({'modified':false});
+		    				model.set({modified: false});
 		    				self.saveBtn.setEnabled(false);
 		                    self.render();
 		              }});
