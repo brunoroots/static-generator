@@ -3,7 +3,12 @@ define(['app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './
 
 function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, EditTemplatePathModalView, ace) {
   return Extension.View.extend({
+<<<<<<< HEAD
     template: 'static-generator/app/templates/main',
+=======
+	msgTimeout: 3000,
+    template: 'static_generator/app/templates/main',
+>>>>>>> https://github.com/directus/static_generator/issues/30
     initialize: function () {
       this.listenTo(this.collection.savedTemplates, 'sync', this.render);
       this.collection.savedTemplates.fetch();
@@ -71,7 +76,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         outputDirectory: outputDirectory
       }, {
         success: function (model, response) {
-          Notification.success(response.message);
+          Notification.success(null, response.message, {timeout:self.msgTimeout});
         	$('#save-output-dir, #output-dir').addClass('hidden');
         	$('#output-dir-text, #edit-output-dir').removeClass('hidden');
         	$('#output-dir-text').val(outputDirectory);
@@ -89,7 +94,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         outputDirectory: outputDirectory
       }, {
         success: function (model, response) {
-          Notification.success(response.message);
+          Notification.success(null, response.message, {timeout:self.msgTimeout});
           self.model.unset('generate');
         }
       });
@@ -103,7 +108,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         outputDirectory: outputDirectory
       }, {
         success: function (model, response) {
-          Notification.success(response.message);
+          Notification.success(null, response.message, {timeout:self.msgTimeout});
           self.model.unset('generate');
         }
       });
@@ -154,7 +159,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
           filePath: tpl.get('file')
         }, {
           success: function (model, response) {
-            Notification.success(response.message);
+            Notification.success(null, response.message, {timeout:self.msgTimeout});
             self.collection.loadedTemplates.remove(tpl);
             tpl = self.collection.loadedTemplates.first();
             var selected = self.collection.loadedTemplates.findWhere({selected: true});
@@ -209,7 +214,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         filePath: tpl.get('file')
       }, {
         success: function (model, response) {
-          Notification.success(response.message);
+          Notification.success(null, response.message, {timeout:self.msgTimeout});
           tpl.set('modified', false);
           self.saveBtn.setEnabled(false);
           self.render();
@@ -243,7 +248,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
 
         tpl.destroy({
           success: function (model, response) {
-            Notification.success(response.message);
+            Notification.success(null, response.message, {timeout:self.msgTimeout});
             Backbone.history.loadUrl(Backbone.history.fragment);
           }
         });
