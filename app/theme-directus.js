@@ -120,15 +120,18 @@ define('ace/theme/directus', ['require', 'exports', 'module', 'ace/lib/dom'], fu
     color: #999999;
   }
 
-
-
   .ace-directus .ace_twig {
     color: #B26CEE;
+  }
+
+  .ace-directus .ace_directus {
+    color: red;
   }
 
   .ace-directus .ace_operator {
     color: #B26CEE;
   }
+
   .ace-directus .ace_identifier {
     color: #B26CEE;
     background-color: rgba(178,108,238, 0.1);
