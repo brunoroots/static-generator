@@ -55,8 +55,7 @@ define('ace/theme/directus', ['require', 'exports', 'module', 'ace/lib/dom'], fu
   }
 
   .ace-directus .ace_gutter-active-line {
-    background-color: #EEEEEE;
-    color: #999999;
+    background-color: #F6F6F6;
   }
 
   .ace-directus .ace_marker-layer .ace_selected-word {
@@ -95,7 +94,7 @@ define('ace/theme/directus', ['require', 'exports', 'module', 'ace/lib/dom'], fu
   }
 
   .ace-directus .ace_fold-widget {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 
   .ace-directus .ace_fold-widget:hover {
@@ -120,8 +119,6 @@ define('ace/theme/directus', ['require', 'exports', 'module', 'ace/lib/dom'], fu
     color: #999999;
   }
 
-
-
   .ace-directus .ace_twig {
     color: #B26CEE;
   }
@@ -133,6 +130,10 @@ define('ace/theme/directus', ['require', 'exports', 'module', 'ace/lib/dom'], fu
     color: #B26CEE;
     background-color: rgba(178,108,238, 0.1);
     border-radius: 3px;
+  }
+
+  .ace-directus .ace_directus {
+    color: red;
   }
 
   .ace-directus .ace_indent-guide {

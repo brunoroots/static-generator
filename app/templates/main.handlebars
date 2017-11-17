@@ -88,15 +88,16 @@
     display: none;
 }
 
-#static-generator .material-icons {
+#static-generator .sg-menu .material-icons {
+	transition: all 200ms ease-in-out 0ms;
     vertical-align: middle;
     margin-top: -2px;
     margin-left: 4px;
-    display:none;
+    opacity: 0;
 }
 
-#static-generator li:hover>i {
-    display: inline-block;
+#static-generator .sg-menu li:hover>i {
+    opacity: 1;
 }
 
 #static-generator .material-icons.delete-file:hover {
@@ -134,6 +135,14 @@ i.delete-file, i.edit-file {
     ~ #code4, #static-generator #tab5:checked ~ #code5 {
     /*display: block;*/
 
+}
+
+#static-generator .file-library {
+    margin: 0px 0px 10px 0px;
+    font-weight: 600;
+    font-size: 11px;
+    color: #666666;
+    text-transform: uppercase;
 }
 
 #static-generator .sg-menu {
@@ -178,9 +187,9 @@ i.delete-file, i.edit-file {
 }
 
 #static-generator .sg-menu ul {
-    margin: 0px 0px 0px 30px;
+    margin: 0px 0px 0px 20px;
     list-style: none;
-    line-height: 1.5em;
+    line-height: 1.6em;
     font-family: Arial;
     color: #BBBBBB;
 }
@@ -238,8 +247,12 @@ i.delete-file, i.edit-file {
 #static-generator .sg-menu ul li:last-child:after {
     display: none;
 }
-.modified span {
-    color:red;
+.modified span:after {
+	content:"*";
+    color: #3498DB;
+    vertical-align: top;
+    margin-left: 2px;
+  	line-height: 12px;
  }
 
 #static-generator .sg-menu ul li a.create-new-template,
@@ -268,7 +281,10 @@ i.delete-file, i.edit-file {
         {{/loadedFiles}}
     </div>
     <div class="sg-menu">
-        {{{directoryStructuresAsUL.directoryTree}}}
+    	<div class="navigation">
+    		<div class="file-library">File Library</div>
+	        {{{directoryStructuresAsUL.directoryTree}}}
+	    </div>
 
         <div class="generation-container">
             <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to Directus root)</div>
