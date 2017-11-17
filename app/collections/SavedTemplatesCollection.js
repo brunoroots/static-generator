@@ -1,6 +1,6 @@
 define(['app', 'backbone', '../models/TemplatesModel'], function (app, Backbone, TemplatesModel) {
   return Backbone.Collection.extend({
-    url: '/api/extensions/static_generator/templates',
+    url: '/api/extensions/static-generator/templates',
     model: TemplatesModel,
     pagesAsJSON: function () {
       return new Backbone.Collection(this.where({

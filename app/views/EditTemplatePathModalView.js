@@ -4,7 +4,7 @@ define(['app', 'backbone', 'core/Modal', 'core/notification'],
 function (app, Backbone, ModalView, Notification) {
   return ModalView.extend({
     prefix: 'customs/extensions/',
-    template: 'static_generator/app/templates/editTemplatePathModalView',
+    template: 'static-generator/app/templates/editTemplatePathModalView',
     afterRender: function () {
     	$('input[name=filePath]').focus();
     },
