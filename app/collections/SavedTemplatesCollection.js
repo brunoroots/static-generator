@@ -1,6 +1,6 @@
 define(['app', 'backbone', '../models/TemplatesModel'], function (app, Backbone, TemplatesModel) {
   return Backbone.Collection.extend({
-    url: '/api/extensions/static-generator/templates',
+    url: '/api/extensions/static_generator/templates',
     model: TemplatesModel,
     pagesAsJSON: function () {
       return new Backbone.Collection(this.where({
@@ -23,6 +23,10 @@ define(['app', 'backbone', '../models/TemplatesModel'], function (app, Backbone,
         hasConfig: true
       })).toJSON();
       return res[0];
+    },
+    updateConfig: function(setting) {
+    	var res = this.findWhere({hasConfig: true});
+    	res.set(Object.keys(setting)[0], Object.values(setting)[0]);
     }
   });
 });

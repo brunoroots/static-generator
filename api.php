@@ -17,7 +17,7 @@ $templateStorageAdapter = new Filesystem( new Local( Template::getTemplateStorag
  * CRON HANDLER                                                                                          *
  * for frequency based generation.                                                                       *
  * To enable on *nix systems, create a cron job using:                                                   *
- *   * * * * * wget -O - http://yoursite.com/api/extensions/static-generator/cron >/dev/null 2>&1        *
+ *   * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1        *
  *********************************************************************************************************/
 $app->get('/cron', function () use ($app, $templateStorageAdapter) {
 
@@ -99,23 +99,7 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
          * Generate site
          */
         if($app->request()->post('generateSite')) {
-
-            // normalize posted path
-            $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
-            $outputDirectory = implode('/', $outputDirectory);
-
-            if( ! Template::isValidOutputPath($outputDirectory)) {
-                throw new Exception('Please enter a valid output path.');
-            }
-
-            // generate site
-            $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  $outputDirectory) );
-            Template::generateSite($templateStorageAdapter, $outputStorageAdapter);
-
-            return $app->response([
-                'success' => true,
-                'message' => 'Site generated in `' . Template::getOutputDirectoryRoot() . '/' .  $outputDirectory . '`',
-            ]);
+            return staticGeneratorGenerateSite($app, $templateStorageAdapter);
         }
 
         /**
@@ -190,6 +174,13 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
 $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAdapter) {
 
     try {
+        /**
+         * Generate site
+         */
+        if($app->request()->post('generateSite')) {
+            return staticGeneratorGenerateSite($app, $templateStorageAdapter);
+        }
+        
         // validation
         if( ! $app->request()->post('filePath')) {
             throw new Exception('Please enter a file path.');
@@ -264,3 +255,25 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorage
         ])->status(400);
     }
 });
+
+
+
+function staticGeneratorGenerateSite($app, $templateStorageAdapter) {
+    
+    // normalize posted path
+    $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
+    $outputDirectory = implode('/', $outputDirectory);
+
+    if( ! Template::isValidOutputPath($outputDirectory)) {
+        throw new Exception('Please enter a valid output path.');
+    }
+
+    // generate site
+    $outputStorageAdapter = new Filesystem( new Local( Template::getOutputDirectoryRoot() . '/' .  $outputDirectory) );
+    Template::generateSite($templateStorageAdapter, $outputStorageAdapter);
+
+    return $app->response([
+        'success' => true,
+        'message' => 'Site generated in `' . Template::getOutputDirectoryRoot() . '/' .  $outputDirectory . '`',
+    ]);
+}
