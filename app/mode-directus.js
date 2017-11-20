@@ -30,20 +30,9 @@ define('ace/mode/directus_highlight_rules', function (require, exports, module) 
      * Add Directus intro comment regex into start rules section
      */
     this.$rules.start.unshift({
-      token: 'directus.tag-open',
-      regex: '<\\!---',
-      next: 'directus-path'
+      token: 'directus',
+      regex: '<!---(?:[^\\\\]|\\\\.)*?--->'
     });
-
-    /**
-     * Add custom Directus highlighting class which moves back to start after match
-     *   of end tag
-     */
-    this.$rules['directus-path'] = [{
-      token: 'directus.tag-close',
-      regex: '---\\>',
-      next: 'start'
-    }];
   };
 
   oop.inherits(DirectusHighlightRules, TwigHighlightRules);
