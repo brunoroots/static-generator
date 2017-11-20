@@ -4,7 +4,7 @@ define(['app', 'backbone', 'core/t', 'core/extensions', 'core/notification', './
 function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, EditTemplatePathModalView, ace) {
   return Extension.View.extend({
     msgTimeout: 3000,
-    template: 'static_generator/app/templates/main',
+    template: 'static-generator/app/templates/main',
     initialize: function () {
       this.listenTo(this.collection.savedTemplates, 'sync', this.render);
       this.collection.savedTemplates.fetch();
@@ -27,7 +27,8 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       	  self = this;
 
       if (tpl) {
-        ace.config.set('themePath', '../customs/extensions/static_generator/app');
+        ace.config.set('themePath', '../customs/extensions/static-generator/app');
+        ace.config.set('modePath', '../customs/extensions/static-generator/app');
         this.editor = ace.edit('editor-' + tpl.get('id'));
         this.editor.setTheme('ace/theme/directus');
         this.editor.session.setMode('ace/mode/directus');

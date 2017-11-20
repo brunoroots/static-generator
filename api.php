@@ -17,7 +17,7 @@ $templateStorageAdapter = new Filesystem( new Local( Template::getTemplateStorag
  * CRON HANDLER                                                                                          *
  * for frequency based generation.                                                                       *
  * To enable on *nix systems, create a cron job using:                                                   *
- *   * * * * * wget -O - http://yoursite.com/api/extensions/static_generator/cron >/dev/null 2>&1        *
+ *   * * * * * wget -O - http://yoursite.com/api/extensions/static-generator/cron >/dev/null 2>&1        *
  *********************************************************************************************************/
 $app->get('/cron', function () use ($app, $templateStorageAdapter) {
 
