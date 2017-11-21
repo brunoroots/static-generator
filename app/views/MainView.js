@@ -28,10 +28,11 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
 
       if (tpl) {
         ace.config.set('themePath', '../customs/extensions/static-generator/app');
-        ace.config.set('modePath', '../customs/extensions/static-generator/app');
+        // ace.config.set('modePath', '../customs/extensions/static-generator/app');
         this.editor = ace.edit('editor-' + tpl.get('id'));
         this.editor.setTheme('ace/theme/directus');
-        this.editor.session.setMode('ace/mode/directus');
+        // this.editor.session.setMode('ace/mode/directus');
+        this.editor.session.setMode('ace/mode/twig');
         this.editor.renderer.setScrollMargin(10, 10);
         this.editor.templateId = tpl.get('id');
 
