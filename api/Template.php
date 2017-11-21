@@ -67,7 +67,9 @@ class Template {
 
             // must provide `filePath` or `id`
             if(ArrayUtils::get($data, 'filePath')) {
-                $this->filePath = ArrayUtils::get($data, 'filePath');
+                $path = ArrayUtils::get($data, 'filePath');
+                
+                $this->filePath = $this->normalizeFilePath($path);
                 $this->id = $this->encodeTemplateId();
             }
 
@@ -75,9 +77,8 @@ class Template {
                 $this->id = ArrayUtils::get($data, 'id');
 
                 $path = $this->decodeTemplateId();
-                $pathParts = explode('/', $path);
-
-                $this->filePath = implode('/', $pathParts);
+                
+                $this->filePath = $this->normalizeFilePath($path);
             }
 
             else {
@@ -451,7 +452,8 @@ class Template {
             }
 
             else {
-                $fileType = array_pop(explode('.', $this->route));
+                $fileType = explode('.', $this->route);
+                $fileType = array_pop($fileType);
                 $fileType = $fileType == $this->route ? 'html' : $fileType;
 
                 $output[] = [
@@ -501,7 +503,8 @@ class Template {
 
                 if( ArrayUtils::get($file, 'type') == 'dir') continue;
 
-                $filePathParts = explode('/', ArrayUtils::get($file, 'path'));
+                $path = ArrayUtils::get($file, 'path');
+                $filePathParts = explode('/', $path);
                 $fileName = array_pop($filePathParts);
 
                 if(trim(substr($fileName, 0, 1)) == '.') continue;
@@ -648,6 +651,19 @@ class Template {
         }
 
         return true;
+    }
+    
+    /**
+     * Normalize file path
+     * 
+     * @param string $path
+     */
+    private function normalizeFilePath($path)
+    {
+        $pathParts = explode('/', $path);
+        $pathParts = array_filter($pathParts);
+        
+        return implode('/', $pathParts);
     }
 
     /**

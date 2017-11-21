@@ -77,6 +77,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         	$('#save-output-dir, #output-dir').addClass('hidden');
         	$('#output-dir-text, #edit-output-dir').removeClass('hidden');
         	$('#output-dir-text').val(outputDirectory);
+            self.model.unset('updateGenerationSettings');
         	self.collection.savedTemplates.updateConfig({generationOutputDirectory: outputDirectory});
         }
       });
@@ -94,7 +95,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }, {
         success: function (model, response) {
           Notification.success(null, response.message, {timeout: self.msgTimeout});
-          self.model.unset('generate');
+          self.model.unset('updateGenerationSettings');
       	  self.collection.savedTemplates.updateConfig({generationMethod: generationMethod});
         }
       });
@@ -110,7 +111,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }, {
         success: function (model, response) {
           Notification.success(null, response.message, {timeout: self.msgTimeout});
-          self.model.unset('generate');
+          self.model.unset('generateSite');
         }
       });
     },

@@ -2,7 +2,7 @@
 require __DIR__ . '/api/Template.php';
 require __DIR__ . '/api/Config.php';
 require __DIR__ . '/api/helpers.php';
-
+error_reporting(E_ALL);
 use Directus\Util\ArrayUtils;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -106,35 +106,15 @@ $app->post('/templates', function () use ($app, $templateStorageAdapter) {
          * Update auto-generation settings
          */
         if($app->request()->post('updateGenerationSettings')) {
-
-            // normalize posted path
-            $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
-            $outputDirectory = implode('/', $outputDirectory);
-
-            if( ! Template::isValidOutputPath($outputDirectory)) {
-                throw new Exception('Please enter a valid output path.');
-            }
-
-            // save settings
-            Config::setGenerationMethod($app->request()->post('generationMethod'));
-            Config::setGenerationOutputDirectory($outputDirectory);
-
-            return $app->response([
-                'success' => true,
-                'message' => 'Generation settings updated.',
-            ]);
+            return staticGeneratorUpdateSettings($app, $templateStorageAdapter);
         }
-
+     
         /**
          * Create new template
          */
         // validation
         if( ! $app->request()->post('filePath')) {
             throw new Exception('Please enter a file path.');
-        }
-
-        if ( substr($app->request()->post('filePath'), -5) != '.html') {
-            //throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
         }
 
         // instantiate
@@ -180,14 +160,17 @@ $app->put('/templates/:id', function ($id = null) use ($app, $templateStorageAda
         if($app->request()->post('generateSite')) {
             return staticGeneratorGenerateSite($app, $templateStorageAdapter);
         }
+
+        /**
+         * Update auto-generation settings
+         */
+        if($app->request()->post('updateGenerationSettings')) {
+            return staticGeneratorUpdateSettings($app, $templateStorageAdapter);
+        }
         
         // validation
         if( ! $app->request()->post('filePath')) {
             throw new Exception('Please enter a file path.');
-        }
-
-        if ( substr($app->request()->post('filePath'), -5) != '.html') {
-            //throw new Exception('The file extension must be `.html`.  Ex - `' . $app->request()->post('filePath') . '.html`.');
         }
 
         // instantiate template
@@ -256,12 +239,32 @@ $app->delete('/templates/:id', function ($id = null) use ($app, $templateStorage
     }
 });
 
-
+function staticGeneratorUpdateSettings($app, $templateStorageAdapter) {
+    
+    // normalize posted path
+    $outputDirectory = $app->request()->post('outputDirectory');
+    $outputDirectory = explode('/', $outputDirectory);
+    $outputDirectory = implode('/', $outputDirectory);
+    
+    if( ! Template::isValidOutputPath($outputDirectory)) {
+        throw new Exception('Please enter a valid output path.');
+    }
+    
+    // save settings
+    Config::setGenerationMethod($app->request()->post('generationMethod'));
+    Config::setGenerationOutputDirectory($outputDirectory);
+    
+    return $app->response([
+        'success' => true,
+        'message' => 'Generation settings updated.',
+    ]);
+}
 
 function staticGeneratorGenerateSite($app, $templateStorageAdapter) {
     
     // normalize posted path
-    $outputDirectory = explode('/', $app->request()->post('outputDirectory'));
+    $outputDirectory = $app->request()->post('outputDirectory');
+    $outputDirectory = explode('/', $outputDirectory);
     $outputDirectory = implode('/', $outputDirectory);
 
     if( ! Template::isValidOutputPath($outputDirectory)) {
