@@ -11,9 +11,45 @@ define('ace/mode/directus', function (require, exports, module) {
   var DirectusHighlightRules = require('ace/mode/directus_highlight_rules').DirectusHighlightRules;
 
   var Mode = function () {
+    TwigMode.call(this);
     this.HighlightRules = DirectusHighlightRules;
   };
   oop.inherits(Mode, TwigMode);
+
+  (function () {
+    this.blockComment = {start: '{#', end: '#}'};
+
+    this.getNextLineIndent = function (state, line, tab) {
+      var indent = this.$getIndent(line);
+
+      var tokenizedLine = this.getTokenizer().getLineTokens(line, state);
+      var tokens = tokenizedLine.tokens;
+      var endState = tokenizedLine.state;
+
+      if (tokens.length && tokens[tokens.length - 1].type == 'comment') {
+        return indent;
+      }
+
+      if (state == 'start') {
+        var match = line.match(/^.*[\{\(\[]\s*$/);
+        if (match) {
+          indent += tab;
+        }
+      }
+
+      return indent;
+    };
+
+    this.checkOutdent = function (state, line, input) {
+      return this.$outdent.checkOutdent(line, input);
+    };
+
+    this.autoOutdent = function (state, doc, row) {
+      this.$outdent.autoOutdent(doc, row);
+    };
+    this.$id = 'ace/mode/directus';
+  }).call(Mode.prototype);
+
   exports.Mode = Mode;
 });
 
@@ -24,7 +60,6 @@ define('ace/mode/directus_highlight_rules', function (require, exports, module) 
 
   var DirectusHighlightRules = function () {
     this.$rules = new TwigHighlightRules().getRules();
-    console.log(this.$rules);
 
     /**
      * Add Directus intro comment regex into start rules section

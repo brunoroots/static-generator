@@ -10,7 +10,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       this.collection.savedTemplates.fetch();
       var self = this;
       setInterval(function () {
-    	  self.saveAll();
+        self.saveAll();
       }, 30000);
     },
     serialize: function () {
@@ -24,7 +24,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     },
     afterRender: function () {
       var tpl = this.collection.loadedTemplates.findWhere({selected: true}),
-      	  self = this;
+        self = this;
 
       if (tpl) {
         ace.config.set('themePath', '../customs/extensions/static-generator/app');
@@ -36,9 +36,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         this.editor.templateId = tpl.get('id');
 
         this.editor.getSession().on('change', function (e) {
-        	var selected = self.collection.loadedTemplates.findWhere({selected: true});
-        	selected.set({modified: true});
-        	selected.set({contents: self.editor.getValue()});
+          var selected = self.collection.loadedTemplates.findWhere({selected: true});
+          selected.set({modified: true});
+          selected.set({contents: self.editor.getValue()});
           $('#label-' + selected.get('id')).addClass('modified');
           self.saveBtn.setEnabled(true);
         });
@@ -57,9 +57,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       'change #generation': 'updateGenerationMethod'
     },
     editOutputDir: function () {
-    	$('#save-output-dir, #output-dir').removeClass('hidden');
-    	$('#output-dir-text, #edit-output-dir').addClass('hidden');
-    	$('#output-dir').focus();
+      $('#save-output-dir, #output-dir').removeClass('hidden');
+      $('#output-dir-text, #edit-output-dir').addClass('hidden');
+      $('#output-dir').focus();
     },
     saveOutputDir: function () {
       var self = this;
@@ -74,11 +74,11 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }, {
         success: function (model, response) {
           Notification.success(null, response.message, {timeout: self.msgTimeout});
-        	$('#save-output-dir, #output-dir').addClass('hidden');
-        	$('#output-dir-text, #edit-output-dir').removeClass('hidden');
-        	$('#output-dir-text').val(outputDirectory);
-            self.model.unset('updateGenerationSettings');
-        	self.collection.savedTemplates.updateConfig({generationOutputDirectory: outputDirectory});
+          $('#save-output-dir, #output-dir').addClass('hidden');
+          $('#output-dir-text, #edit-output-dir').removeClass('hidden');
+          $('#output-dir-text').val(outputDirectory);
+          self.model.unset('updateGenerationSettings');
+          self.collection.savedTemplates.updateConfig({generationOutputDirectory: outputDirectory});
         }
       });
     },
@@ -96,7 +96,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
         success: function (model, response) {
           Notification.success(null, response.message, {timeout: self.msgTimeout});
           self.model.unset('updateGenerationSettings');
-      	  self.collection.savedTemplates.updateConfig({generationMethod: generationMethod});
+          self.collection.savedTemplates.updateConfig({generationMethod: generationMethod});
         }
       });
     },
@@ -124,7 +124,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       var selected = this.collection.loadedTemplates.findWhere({selected: true});
 
       if (selected) {
-    	selected.set({contents: this.editor.getValue()});
+        selected.set({contents: this.editor.getValue()});
         selected.set({selected: false});
       }
 
@@ -134,9 +134,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       }
 
       if (tpl.get('modified')) {
-    	  this.saveBtn.setEnabled(true);
+        this.saveBtn.setEnabled(true);
       } else {
-    	  this.saveBtn.setEnabled(false);
+        this.saveBtn.setEnabled(false);
       }
 
       tpl.set({selected: true});
@@ -146,48 +146,48 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     },
     unloadTemplate: function (e) {
       var tpl = this.collection.loadedTemplates.findWhere({id: $(e.target).attr('data-id')}),
-      	  self = this;
+        self = this;
 
       app.router.openModal({type: 'yesno', text: __t('Save file?'), callback: function (res) {
         if (!tpl) {
           return false;
         }
 
-    	  if (res == 'yes') { // save and close
-    		tpl.set({contents: self.editor.getValue()});
-        self.model.save({
-          id: tpl.get('id'),
-          contents: self.editor.getValue(),
-          filePath: tpl.get('file')
-        }, {
-          success: function (model, response) {
-            Notification.success(null, response.message, {timeout: self.msgTimeout});
-            self.collection.loadedTemplates.remove(tpl);
-            tpl = self.collection.loadedTemplates.first();
-            var selected = self.collection.loadedTemplates.findWhere({selected: true});
+        if (res == 'yes') { // save and close
+          tpl.set({contents: self.editor.getValue()});
+          self.model.save({
+            id: tpl.get('id'),
+            contents: self.editor.getValue(),
+            filePath: tpl.get('file')
+          }, {
+            success: function (model, response) {
+              Notification.success(null, response.message, {timeout: self.msgTimeout});
+              self.collection.loadedTemplates.remove(tpl);
+              tpl = self.collection.loadedTemplates.first();
+              var selected = self.collection.loadedTemplates.findWhere({selected: true});
 
-            if (!selected && tpl) {
-              tpl.set({selected: true});
+              if (!selected && tpl) {
+                tpl.set({selected: true});
+              }
+
+              self.render();
             }
+          });
+        } else { // close, don't save
+          self.collection.loadedTemplates.remove(tpl);
+          tpl = self.collection.loadedTemplates.first();
+          var selected = self.collection.loadedTemplates.findWhere({selected: true});
 
-            self.render();
+          if (!selected && tpl) {
+            tpl.set({selected: true});
           }
-        });
-    	  } else { // close, don't save
-        self.collection.loadedTemplates.remove(tpl);
-        tpl = self.collection.loadedTemplates.first();
-        var selected = self.collection.loadedTemplates.findWhere({selected: true});
 
-        if (!selected && tpl) {
-          tpl.set({selected: true});
+          self.render();
         }
 
-        self.render();
-    	  }
-
-    	  if (tpl) {
-    		  tpl.set({modified: false});
-    	  }
+        if (tpl) {
+          tpl.set({modified: false});
+        }
         self.saveBtn.setEnabled(false);
       }});
     },
@@ -207,7 +207,7 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     },
     saveTemplate: function () {
       var tpl = this.collection.loadedTemplates.findWhere({selected: true}),
-      	  self = this;
+        self = this;
       tpl.set({contents: this.editor.getValue()});
 
       this.model.save({
@@ -227,24 +227,24 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
     },
     saveAll: function () {
       var self = this;
-  	  if (self.collection.loadedTemplates) {
-  		  self.collection.loadedTemplates.each(function (model) {
-  			  if (model.get('modified')) {
-		              model.save({
-		                generateSite: false,
-		                updateGenerationSettings: false,
-		                id: model.get('id'),
-		                contents: model.get('contents'),
-		                filePath: model.get('file')
-		              }, {
-		                success: function (model, response) {
-		    				model.set({modified: false});
-		    				self.saveBtn.setEnabled(false);
-		                    self.render();
-		              }});
-  			  }
-  		  });
-  	  }
+      if (self.collection.loadedTemplates) {
+        self.collection.loadedTemplates.each(function (model) {
+          if (model.get('modified')) {
+            model.save({
+              generateSite: false,
+              updateGenerationSettings: false,
+              id: model.get('id'),
+              contents: model.get('contents'),
+              filePath: model.get('file')
+            }, {
+              success: function (model, response) {
+                model.set({modified: false});
+                self.saveBtn.setEnabled(false);
+                self.render();
+              }});
+          }
+        });
+      }
     },
     deleteTemplate: function (e) {
       this.saveAll();
