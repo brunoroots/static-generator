@@ -21,7 +21,7 @@ define(['app', 'backbone', 'core/Modal', 'core/notification', 'ace/ace'], functi
           filePath: this.$('input[name=filePath]').val()
       }, {
         success: function (model, response) {
-          Notification.success(null, response.message, {timeout:self.msgTimeout})
+          //Notification.success(null, response.message, {timeout:self.msgTimeout})
           Backbone.history.loadUrl(Backbone.history.fragment);
           $('#modal_container').hide();
           setTimeout(function(){

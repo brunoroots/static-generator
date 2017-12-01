@@ -27,7 +27,7 @@ function (app, Backbone, ModalView, Notification) {
         contents: this.model.attributes.contents
       }, {
         success: function (model, response) {
-          Notification.success(null, response.message, {timeout:self.msgTimeout})
+          //Notification.success(null, response.message, {timeout:self.msgTimeout})
           Backbone.history.loadUrl(Backbone.history.fragment);
           $('#modal_container').hide();
         }
