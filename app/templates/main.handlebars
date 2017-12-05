@@ -272,7 +272,7 @@ i.delete-file, i.edit-file {
 		<div class="tabs">
 			{{#loadedFiles}}
 			<input id="tab-{{id}}" data-id="{{id}}" class="tab" type="radio" {{#if selected}}checked{{/if}} >
-			<label for="tab-{{id}}" id="label-{{id}}" class="{{#if modified}}modified{{/if}}" ><span data-id="{{id}}" class="tab-link">{{fileName}}</span> <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
+			<label for="tab-{{id}}" id="label-{{id}}" data-id="{{id}}" class="tab-link {{#if modified}}modified{{/if}}" ><span data-id="{{id}}" class="tab-link">{{fileName}}</span> <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
 			{{/loadedFiles}}
 		</div>
 
