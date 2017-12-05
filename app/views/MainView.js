@@ -9,9 +9,9 @@ function (app, Backbone, __t, Extension, Notification, CreateTemplateModalView, 
       this.listenTo(this.collection.savedTemplates, 'sync', this.render);
       this.collection.savedTemplates.fetch();
       var self = this;
-      setInterval(function () {
-        self.saveAll();
-      }, 30000);
+//      setInterval(function () {
+//        self.saveAll();
+//      }, 30000);
     },
     serialize: function () {
       return {
